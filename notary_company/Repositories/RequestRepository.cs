@@ -19,14 +19,14 @@ namespace notary_company.Repositories
         public int Create(Request entity)
         {
             const string sql = @"
-                INSERT INTO requests (client_phone, additional_information, request_date, request_status)
-                VALUES (@ClientPhone, @AdditionalInformation, @RequestDate, 'ожидание')
+                INSERT INTO requests (client_phone, additional_information, request_date)
+                VALUES (@ClientPhone, @AdditionalInformation, @RequestDate)
                 RETURNING request_id";
 
             return _connection.QuerySingle<int>(sql, new
             {
-                entity.ClientPhone,
-                entity.AdditionalInformation,
+                entity.Client_phone,
+                entity.Additional_information,
                 RequestDate = DateTime.Now
             });
         }
@@ -59,19 +59,13 @@ namespace notary_company.Repositories
             });
         }
 
-        public void AddServiceToRequest(int requestId, int serviceId)
+        private void AddServiceToRequest(int requestId, int serviceId)
         {
             const string sql = @"
                 INSERT INTO request_services (request_id, service_id)
                 VALUES (@RequestId, @ServiceId)
                 ON CONFLICT (request_id, service_id) DO NOTHING";
 
-            _connection.Execute(sql, new { RequestId = requestId, ServiceId = serviceId });
-        }
-
-        public void RemoveServiceFromRequest(int requestId, int serviceId)
-        {
-            const string sql = "DELETE FROM request_services WHERE request_id = @RequestId AND service_id = @ServiceId";
             _connection.Execute(sql, new { RequestId = requestId, ServiceId = serviceId });
         }
 
@@ -98,12 +92,6 @@ namespace notary_company.Repositories
             return _connection.Query<Request>(sql, new { Status = status }).ToList();
         }
 
-        public void Delete(int requestId)
-        {
-            const string sql = "DELETE FROM requests WHERE request_id = @RequestId";
-            _connection.Execute(sql, new { RequestId = requestId });
-        }
-
         public int CreateWithServices(Request request, List<int> serviceIds)
         {
             using var transaction = _connection.BeginTransaction();
@@ -117,15 +105,14 @@ namespace notary_company.Repositories
 
                 var requestId = _connection.QuerySingle<int>(requestSql, new
                 {
-                    request.ClientPhone,
-                    request.AdditionalInformation,
+                    request.Client_phone,
+                    request.Additional_information,
                     RequestDate = DateTime.Now
                 }, transaction);
 
                 foreach (var serviceId in serviceIds)
                 {
-                    const string serviceSql = "INSERT INTO request_services (request_id, service_id) VALUES (@RequestId, @ServiceId)";
-                    _connection.Execute(serviceSql, new { RequestId = requestId, ServiceId = serviceId }, transaction);
+                    AddServiceToRequest(request.Request_id, serviceId);
                 }
 
                 transaction.Commit();

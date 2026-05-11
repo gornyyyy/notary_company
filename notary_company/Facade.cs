@@ -39,6 +39,24 @@ namespace notary_company
         }
 
 
+        public string GetNotaryNameByLogin(string login)
+        {
+            User user = Users.GetByLogin(login);
 
+            Notary notary = Notaries.ReadByUserId(user.User_id);
+
+            return notary.Notary_name;
+        }
+
+        public string GetNotaryPasswordByLogin(string login)
+        {
+            User user = Users.GetByLogin(login);
+
+            if (user != null)
+            {
+                return user.Password_hash;
+            }
+            else return null;
+        }
     }
 }

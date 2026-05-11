@@ -79,9 +79,9 @@ namespace notary_company.Repositories
                 var notaryId = _connection.QuerySingle<int>(notarySql, new
                 {
                     UserId = userId,
-                    notary.NotaryName,
-                    notary.NotaryDescription,
-                    notary.NotaryPhone,
+                    notary.Notary_name,
+                    notary.Notary_description,
+                    notary.Notary_phone,
                 }, transaction);
 
                 transaction.Commit();

@@ -19,27 +19,29 @@
             Margin="23,32,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            CornerRadius="10"
-            Background="#2C3E50">
+            CornerRadius="25"
+            Background="#FFCECE">
             <TextBlock 
                 Text="Нотариальная контора" 
-                FontSize="16" 
-                FontWeight="Bold"
-                Foreground="White"
+                FontSize="24" 
+                FontWeight="ExtraBold"
+                Foreground="Black"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"/>
         </Border>
 
-        <!-- Ссылка "Войти как нотариус" -->
+        <!-- Надпись "Войти как нотариус" или имя нотариуса -->
         <TextBlock 
+            x:Name="NotaryLoginText"
             Text="Войти как нотариус"
-            FontSize="12"
-            Foreground="#2980B9"
+            FontSize="22"
+            Foreground="Black"
             Cursor="Hand"
             Margin="0,42,23,0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            TextDecorations="Underline">
+            TextDecorations="Underline"
+            MouseLeftButtonDown="NotaryLoginText_MouseLeftButtonDown">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="Foreground" Value="#2980B9"/>
@@ -54,50 +56,48 @@
 
         <!-- Верхняя панель с кнопками -->
         <Border 
-            Width="1200" 
             Height="80"
             Margin="0,114,0,0"
-            HorizontalAlignment="Left"
             VerticalAlignment="Top"
-            Background="#34495E">
+            Background="#BA6A6A">
 
             <Grid>
-                <!-- Контейнер для равномерного распределения кнопок -->
-                <StackPanel 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+                <!-- Контейнер для кнопок -->
+                <StackPanel Orientation="Horizontal" Margin="90,0,0,0">
 
                     <!-- Кнопка "Каталог услуг" -->
                     <Button x:Name="btnCatalog" 
                             Content="Каталог услуг"
-                            Width="180"
-                            Height="40"
-                            Margin="20,0"
-                            FontSize="14"
+                            FontSize="30"
                             FontWeight="Bold"
                             Foreground="White"
-                            Cursor="Hand">
+                            Cursor="Hand"
+                            HorizontalContentAlignment="Right"
+                            VerticalContentAlignment="Center" 
+                            Width="245">
                         <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#3498DB"/>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
+                                        <ControlTemplate TargetType="{x:Type Button}">
                                             <Border Background="{TemplateBinding Background}" 
-                                                    CornerRadius="5">
-                                                <ContentPresenter HorizontalAlignment="Center" 
-                                                                  VerticalAlignment="Center"/>
+                                                    CornerRadius="5"
+                                                    Padding="20,0">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                             </Border>
                                         </ControlTemplate>
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#2980B9"/>
+                                        <Setter Property="Background" Value="#33FFFFFF"/>
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="#1abc9c"/>
+                                        <Setter Property="Background" Value="#4DFFFFFF"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -107,33 +107,36 @@
                     <!-- Кнопка "Подать заявку" -->
                     <Button x:Name="btnCreateRequest" 
                             Content="Подать заявку"
-                            Width="180"
-                            Height="40"
-                            Margin="20,0"
-                            FontSize="14"
+                            FontSize="30"
                             FontWeight="Bold"
                             Foreground="White"
-                            Cursor="Hand">
+                            Cursor="Hand"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" 
+                            Width="400">
                         <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#27AE60"/>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
+                                        <ControlTemplate TargetType="{x:Type Button}">
                                             <Border Background="{TemplateBinding Background}" 
-                                                    CornerRadius="5">
-                                                <ContentPresenter HorizontalAlignment="Center" 
-                                                                  VerticalAlignment="Center"/>
+                                                    CornerRadius="5"
+                                                    Padding="20,0">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                             </Border>
                                         </ControlTemplate>
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#229954"/>
+                                        <Setter Property="Background" Value="#33FFFFFF"/>
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="#1E8449"/>
+                                        <Setter Property="Background" Value="#4DFFFFFF"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -143,33 +146,36 @@
                     <!-- Кнопка "Посмотреть мои заявки" -->
                     <Button x:Name="btnMyRequests" 
                             Content="Посмотреть мои заявки"
-                            Width="180"
-                            Height="40"
-                            Margin="20,0"
-                            FontSize="14"
+                            FontSize="30"
                             FontWeight="Bold"
                             Foreground="White"
-                            Cursor="Hand">
+                            Cursor="Hand"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center" 
+                            Width="394">
                         <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#8E44AD"/>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
                                 <Setter Property="Template">
                                     <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
+                                        <ControlTemplate TargetType="{x:Type Button}">
                                             <Border Background="{TemplateBinding Background}" 
-                                                    CornerRadius="5">
-                                                <ContentPresenter HorizontalAlignment="Center" 
-                                                                  VerticalAlignment="Center"/>
+                                                    CornerRadius="5"
+                                                    Padding="20,0">
+                                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                             </Border>
                                         </ControlTemplate>
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#7D3C98"/>
+                                        <Setter Property="Background" Value="#33FFFFFF"/>
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
-                                        <Setter Property="Background" Value="#6C3483"/>
+                                        <Setter Property="Background" Value="#4DFFFFFF"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -179,16 +185,5 @@
             </Grid>
         </Border>
 
-        <!-- Основной контент (будет меняться при навигации) -->
-        <Frame x:Name="MainFrame" 
-               Margin="0,194,0,0"
-               NavigationUIVisibility="Hidden"/>
-
-        <!-- Нижняя панель статуса -->
-        <StatusBar Grid.Row="1" VerticalAlignment="Bottom" Height="25">
-            <StatusBarItem>
-                <TextBlock x:Name="txtStatus" Text="Готов" FontSize="11"/>
-            </StatusBarItem>
-        </StatusBar>
     </Grid>
 </Window>

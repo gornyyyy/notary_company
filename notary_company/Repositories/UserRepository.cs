@@ -49,12 +49,6 @@ namespace notary_company.Repositories
             return _connection.QueryFirstOrDefault<User>(sql, new { Login = login });
         }
 
-        public bool LoginExists(string login)
-        {
-            const string sql = "SELECT COUNT(1) FROM users WHERE login = @Login";
-            return _connection.ExecuteScalar<bool>(sql, new { Login = login });
-        }
-
         public void UpdatePassword(int userId, string newPasswordHash)
         {
             const string sql = "UPDATE users SET password_hash = @PasswordHash WHERE user_id = @UserId";

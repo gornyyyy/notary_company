@@ -1,6 +1,7 @@
-﻿using System.Windows;
+﻿using notary_company.Pages;
+using System.Windows;
 using System.Windows.Controls;
-using notary_company.Pages;
+using System.Windows.Input;
 
 namespace notary_company
 {
@@ -13,10 +14,29 @@ namespace notary_company
             InitializeComponent();
             _facade = App.Facade;
 
-            
         }
 
 
+        private void NotaryLoginText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (IsNotaryLoggedIn())
+                return;
+
+            LoginWindow loginWindow = new LoginWindow();
+            loginWindow.Owner = Window.GetWindow(this);
+            bool? result = loginWindow.ShowDialog();
+
+            if (result == true)
+            {
+                string notaryName = loginWindow.NotaryName;
+
+                NotaryLoginText.Text = notaryName;
+            }
+        }
+        private bool IsNotaryLoggedIn()
+        {
+            return NotaryLoginText.Text != "Войти как нотариус";
+        }
 
     }
 }

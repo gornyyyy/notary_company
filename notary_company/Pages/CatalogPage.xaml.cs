@@ -14,11 +14,11 @@ using System.Windows.Shapes;
 namespace notary_company.Pages
 {
     /// <summary>
-    /// Логика взаимодействия для NotaryMainPage.xaml
+    /// Логика взаимодействия для CatalogPage.xaml
     /// </summary>
-    public partial class NotaryMainPage : Page
+    public partial class CatalogPage : Page
     {
-        public NotaryMainPage()
+        public CatalogPage()
         {
             InitializeComponent();
         }
