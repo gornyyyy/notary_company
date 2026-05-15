@@ -1,4 +1,5 @@
-﻿using notary_company.Pages;
+﻿using notary_company.Models;
+using notary_company.Pages;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -7,35 +8,21 @@ namespace notary_company
 {
     public partial class MainWindow : Window
     {
-        private readonly Facade _facade;
+        public Facade facade;
+        public Notary Notary;
+        public bool IsNotaryLogged = false;
 
         public MainWindow()
         {
             InitializeComponent();
-            _facade = App.Facade;
+            facade = App.Facade;
 
+            MainFrame.Navigate(new ClientMainPage(this));
         }
 
-
-        private void NotaryLoginText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        public void SwitchToNotaryPage(string notaryName)
         {
-            if (IsNotaryLoggedIn())
-                return;
-
-            LoginWindow loginWindow = new LoginWindow();
-            loginWindow.Owner = Window.GetWindow(this);
-            bool? result = loginWindow.ShowDialog();
-
-            if (result == true)
-            {
-                string notaryName = loginWindow.NotaryName;
-
-                NotaryLoginText.Text = notaryName;
-            }
-        }
-        private bool IsNotaryLoggedIn()
-        {
-            return NotaryLoginText.Text != "Войти как нотариус";
+            MainFrame.Navigate(new NotaryMainPage(this, notaryName));
         }
 
     }

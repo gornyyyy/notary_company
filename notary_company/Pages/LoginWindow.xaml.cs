@@ -11,18 +11,21 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BCrypt.Net;
+using notary_company.Models;
 
 namespace notary_company.Pages
 {
     public partial class LoginWindow : Window
     {
+        private MainWindow _mainWindow;
         private Facade _facade;
-        public string NotaryName { get; private set; }
-        public LoginWindow()
+        public LoginWindow(MainWindow mainWindow)
         {
             InitializeComponent();
 
-            _facade = App.Facade;
+            _mainWindow = mainWindow;
+
+            _facade = _mainWindow.facade;
         }
 
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
@@ -37,7 +40,8 @@ namespace notary_company.Pages
                 MessageBox.Show("Вход выполнен успешно!", "Успех",
                     MessageBoxButton.OK, MessageBoxImage.Information);
 
-                NotaryName = _facade.GetNotaryNameByLogin(login);
+                _mainWindow.Notary = _facade.GetNotaryByLogin(login);
+                _mainWindow.SwitchToNotaryPage(_mainWindow.Notary.Notary_name);
 
                 this.DialogResult = true;
                 this.Close();

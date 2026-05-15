@@ -9,7 +9,7 @@ using System.Text;
 
 namespace notary_company
 {
-    public class Facade
+    public class Facade: INotary, IClient
     {
         private readonly IDbConnection _connection;
 
@@ -38,14 +38,31 @@ namespace notary_company
             _connection?.Dispose();
         }
 
+        public void addHelper(string name, string login, string passwordhash, string descr)
+        {
 
-        public string GetNotaryNameByLogin(string login)
+        }
+
+        public void updateRequestStatus(int request_id, string new_status, DateTime date_of_completion)
+        {
+
+        }
+        public List<Request> getAllRequests()
+        {
+            return Requests.ReadAll();
+        }
+        public List<Service> getServicesForRequest()
+        {
+            return null ;
+        }
+
+        public Notary GetNotaryByLogin(string login)
         {
             User user = Users.GetByLogin(login);
 
             Notary notary = Notaries.ReadByUserId(user.User_id);
 
-            return notary.Notary_name;
+            return notary;
         }
 
         public string GetNotaryPasswordByLogin(string login)
@@ -58,5 +75,21 @@ namespace notary_company
             }
             else return null;
         }
+
+        public List<Notary> getAllNotary()
+        {
+            return Notaries.ReadAll();
+        }
+
+        // IClient
+        public void createRequest(string client_phone, string descr, List<int> services_id)
+        {
+
+        }
+        public List<Service> getAllServices()
+        {
+            return Services.ReadAll();
+        }
+
     }
 }

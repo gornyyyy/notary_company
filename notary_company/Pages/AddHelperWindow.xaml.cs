@@ -8,19 +8,23 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace notary_company.Pages
 {
     /// <summary>
-    /// Логика взаимодействия для MainPage.xaml
+    /// Логика взаимодействия для AddHelperWindow.xaml
     /// </summary>
-    public partial class MainPage : Page
+    public partial class AddHelperWindow : Window
     {
-        public MainPage()
+        public AddHelperWindow()
         {
             InitializeComponent();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

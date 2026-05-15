@@ -24,7 +24,6 @@ namespace notary_company
         private void App_Exit(object sender, EventArgs e)
         {
             Facade?.Dispose();  
-
         }
     }
 }
