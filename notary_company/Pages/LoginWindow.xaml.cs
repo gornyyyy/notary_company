@@ -37,9 +37,7 @@ namespace notary_company.Pages
 
             if (passwordhash != null && BCrypt.Net.BCrypt.Verify(password, passwordhash))
             {
-                MessageBox.Show("Вход выполнен успешно!", "Успех",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-
+                
                 _mainWindow.Notary = _facade.GetNotaryByLogin(login);
                 _mainWindow.SwitchToNotaryPage(_mainWindow.Notary.Notary_name);
 

@@ -206,6 +206,12 @@ PublishScripts/
 *.nuget.props
 *.nuget.targets
 
+# Конфиденциальные данные и секреты
+secrets.json
+*.secrets.json
+**/secrets.json
+**/appsettings.Secrets.json
+
 # Microsoft Azure Build Output
 csx/
 *.build.csdef

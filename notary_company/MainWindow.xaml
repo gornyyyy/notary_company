@@ -2,9 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Нотариальная контора" 
-        Width="1200" Height="700"
+        Width="1200" 
+        Height="700"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        MinWidth="800"
+        MinHeight="600">
 
     <Grid>
         <!-- Фоновый цвет окна -->
@@ -13,6 +16,7 @@
         </Grid.Background>
 
         <!-- Контент для страниц -->
-        <Frame x:Name="MainFrame" />
+        <Frame x:Name="MainFrame" 
+               NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>

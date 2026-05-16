@@ -73,7 +73,7 @@ namespace notary_company.Repositories
 
                 const string notarySql = @"
                     INSERT INTO notaries (user_id, notary_name, notary_description, notary_phone)
-                    VALUES (@UserId, @NotaryName, @NotaryDescription, @NotaryPhone)
+                    VALUES (@UserId, @Notary_name, @Notary_description, @Notary_phone)
                     RETURNING notary_id";
 
                 var notaryId = _connection.QuerySingle<int>(notarySql, new

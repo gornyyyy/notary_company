@@ -9,22 +9,70 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BCrypt;
 
 namespace notary_company.Pages
 {
-    /// <summary>
-    /// Логика взаимодействия для AddHelperWindow.xaml
-    /// </summary>
     public partial class AddHelperWindow : Window
     {
+        Facade _facade;
         public AddHelperWindow()
         {
             InitializeComponent();
+            _facade = App.Facade;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            string name = HelperNameTextBox.Text;
+            string login = HelperLoginTextBox.Text;
+            string descr = HelperDescriptionTextBox.Text;
 
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(login))
+            {
+                if (string.IsNullOrEmpty(name))
+                    NameTxtStatus.Text = "Обязательное поле";
+                if (string.IsNullOrEmpty(login))
+                    LoginTxtStatus.Text = "Обязательное поле";
+            }
+            else
+            {
+                string password = GeneratePassword();
+                string password_hash = BCrypt.Net.BCrypt.HashPassword(password);
+                _facade.addHelper(name, login, password_hash, descr);
+
+                MessageBoxResult result = MessageBox.Show(
+                    $"Пароль: {password}\n\nСкопировать пароль в буфер обмена?",
+                    "Пароль для нового помощника",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    System.Windows.Clipboard.SetText(password);
+                    MessageBox.Show("Пароль скопирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                this.DialogResult = true;
+                this.Close();
+            }
+        }
+
+        private string GeneratePassword()
+        {
+            Random random = new Random();
+            string parametrz = "qwertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
+            int lng = parametrz.Length;
+            int len = random.Next(10, 15);
+
+            string password = "";
+
+            for (int i = 0; i < len; i++)
+            {
+                password += parametrz[random.Next(lng)];
+            }
+
+            return password;
         }
     }
 }

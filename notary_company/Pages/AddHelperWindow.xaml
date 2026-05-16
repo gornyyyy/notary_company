@@ -50,18 +50,31 @@
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top"/>
 
-        <TextBox x:Name="HelperNameTextBox" 
-                 Margin="39,160,0,0" 
-                 Width="371" 
-                 Height="40"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 FontSize="14"
-                 Padding="10,0,0,0"
-                 BorderBrush="#BA6A6A"
-                 BorderThickness="1"
-                 Background="White"
-                 />
+        <!-- Border для TextBox ФИО -->
+        <Border Width="371" 
+                Height="35"
+                Margin="39,160,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="8"
+                BorderBrush="#BA6A6A"
+                BorderThickness="1"
+                Background="White">
+            <TextBox x:Name="HelperNameTextBox" 
+                     FontSize="18"
+                     VerticalContentAlignment="Center"
+                     BorderThickness="0"
+                     Background="White" Margin="3,2,3,2"/>
+        </Border>
+
+        <TextBlock x:Name="NameTxtStatus"
+                   Text=""
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="Red"
+                   Margin="39,200,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
 
         <!-- ========== Поле Логин ========== -->
         <TextBlock Text="Логин"
@@ -72,18 +85,31 @@
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top"/>
 
-        <TextBox x:Name="HelperLoginTextBox" 
-                 Margin="39,250,0,0" 
-                 Width="371" 
-                 Height="40"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 FontSize="14"
-                 Padding="10,0,0,0"
-                 BorderBrush="#BA6A6A"
-                 BorderThickness="1"
-                 Background="White"
-                 />
+        <!-- Border для TextBox Логин -->
+        <Border Width="371" 
+                Height="35"
+                Margin="39,250,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="8"
+                BorderBrush="#BA6A6A"
+                BorderThickness="1"
+                Background="White">
+            <TextBox x:Name="HelperLoginTextBox" 
+                     FontSize="18"
+                     VerticalContentAlignment="Center"
+                     BorderThickness="0"
+                     Background="White" Margin="3,2,3,2"/>
+        </Border>
+
+        <TextBlock x:Name="LoginTxtStatus"
+                   Text=""
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="Red"
+                   Margin="39,290,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
 
         <!-- ========== Поле Статус ========== -->
         <TextBlock Text="Статус"
@@ -102,7 +128,7 @@
                 Background="#F0F0F0"
                 BorderBrush="#CCCCCC"
                 BorderThickness="1"
-                CornerRadius="5">
+                CornerRadius="8">
             <TextBlock Text="Помощник нотариуса"
                        FontSize="14"
                        Foreground="#666666"
@@ -119,27 +145,32 @@
                    HorizontalAlignment="Left"
                    VerticalAlignment="Top"/>
 
-        <TextBox x:Name="HelperDescriptionTextBox" 
-                 Margin="525,160,50,0" 
-                 Width="310"
-                 Height="280"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 FontSize="14"
-                 Padding="10,5,0,0"
-                 BorderBrush="#BA6A6A"
-                 BorderThickness="1"
-                 Background="White"
-                 TextWrapping="Wrap"
-                 AcceptsReturn="True"
-                 VerticalScrollBarVisibility="Auto"/>
+        <!-- Border для TextBox Описание -->
+        <Border Width="310" 
+                Height="280"
+                Margin="525,160,50,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="8"
+                BorderBrush="#BA6A6A"
+                BorderThickness="1"
+                Background="White">
+            <TextBox x:Name="HelperDescriptionTextBox" 
+                     FontSize="16"
+                     Padding="5,5,0,0"
+                     BorderThickness="0"
+                     Background="White"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto" Margin="0,9,0,9"/>
+        </Border>
 
         <!-- ========== Кнопка Сохранить ========== -->
         <Button x:Name="SaveButton" 
                 Content="Сохранить"
                 Width="200" 
                 Height="45"
-                Margin="350,520,0,0"
+                Margin="350,490,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Background="#B25B5B"

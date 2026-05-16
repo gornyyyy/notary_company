@@ -40,7 +40,10 @@ namespace notary_company
 
         public void addHelper(string name, string login, string passwordhash, string descr)
         {
-
+            Notary notary = new Notary();
+            notary.Notary_name = name;
+            notary.Notary_description = descr;
+            Notaries.CreateWithUser(notary, login, passwordhash);
         }
 
         public void updateRequestStatus(int request_id, string new_status, DateTime date_of_completion)

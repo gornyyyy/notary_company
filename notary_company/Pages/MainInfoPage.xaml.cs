@@ -30,7 +30,6 @@ namespace notary_company.Pages
 
         private Border CreateNotaryCard(Notary notary)
         {
-            // Основная карточка на всю ширину
             Border card = new Border
             {
                 Margin = new Thickness(0, 0, 0, 15),
@@ -41,13 +40,11 @@ namespace notary_company.Pages
                 Padding = new Thickness(20, 15, 20, 15)
             };
 
-            // Внутренний контейнер
             StackPanel stackPanel = new StackPanel
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch
             };
 
-            // ФИО сотрудника
             TextBlock nameText = new TextBlock
             {
                 Text = notary.Notary_name,
@@ -60,7 +57,6 @@ namespace notary_company.Pages
             };
             stackPanel.Children.Add(nameText);
 
-            // Должность
             TextBlock positionText = new TextBlock
             {
                 Text = notary.Is_notary_helper ? "Помощник нотариуса" : "Нотариус",
@@ -72,7 +68,6 @@ namespace notary_company.Pages
             };
             stackPanel.Children.Add(positionText);
 
-            // Разделитель
             Border separator = new Border
             {
                 Height = 1,
@@ -81,7 +76,6 @@ namespace notary_company.Pages
             };
             stackPanel.Children.Add(separator);
 
-            // Описание
             TextBlock descriptionText = new TextBlock
             {
                 Text = notary.Notary_description ?? "Нет описания",

@@ -1,6 +1,8 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using Microsoft.Extensions.Configuration;
 using Npgsql;
+using System.Configuration;
+using System.Data;
+using System.Text.Json;
 using System.Windows;
 
 namespace notary_company
@@ -11,14 +13,22 @@ namespace notary_company
     public partial class App : Application
     {
         public static Facade Facade { get; private set; }
+        public static IConfiguration Configuration { get; private set; }
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
-            string connectionString = "Server=localhost;Port=5432;Database=notary_company;User Id=postgres;Password=1239Exkrim;";
+            
+                Configuration = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile("secrets.json", optional: false, reloadOnChange: false)
+                    .Build();
 
-            IDbConnection connection = new NpgsqlConnection(connectionString);
+                string connectionString = Configuration.GetConnectionString("Postgres");
 
-            Facade = new Facade(connection);
+                IDbConnection connection = new NpgsqlConnection(connectionString);
+
+                Facade = new Facade(connection);
+
         }
 
         private void App_Exit(object sender, EventArgs e)

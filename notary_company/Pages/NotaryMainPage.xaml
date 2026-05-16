@@ -45,7 +45,8 @@
                 Height="80"
                 Margin="0,114,0,0"
                 VerticalAlignment="Top"
-                Background="#BA6A6A">
+                Background="#BA6A6A"
+                HorizontalAlignment="Stretch">
 
                 <Grid>
                     <StackPanel Orientation="Horizontal" Margin="90,0,0,0">
@@ -139,7 +140,7 @@
                                 Cursor="Hand"
                                 HorizontalContentAlignment="Left"
                                 VerticalContentAlignment="Center" 
-                                Width="394"
+                                Width="365"
                                 Click="BtnAddAssistant_Click">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
