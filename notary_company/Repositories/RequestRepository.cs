@@ -15,19 +15,20 @@ namespace notary_company.Repositories
         {
             _connection = connection;
         }
+        
 
         public int Create(Request entity)
         {
             const string sql = @"
                 INSERT INTO requests (client_phone, additional_information, request_date)
-                VALUES (@ClientPhone, @AdditionalInformation, @RequestDate)
+                VALUES (@Client_phone, @Additional_information, @Request_date)
                 RETURNING request_id";
 
             return _connection.QuerySingle<int>(sql, new
             {
                 entity.Client_phone,
                 entity.Additional_information,
-                RequestDate = DateTime.Now
+                Request_date = DateTime.Now
             });
         }
 
@@ -100,19 +101,19 @@ namespace notary_company.Repositories
             {
                 const string requestSql = @"
                     INSERT INTO requests (client_phone, additional_information, request_date, request_status)
-                    VALUES (@ClientPhone, @AdditionalInformation, @RequestDate, 'ожидание')
+                    VALUES (@Client_phone, @Additional_information, @Request_date, 'ожидание')
                     RETURNING request_id";
 
                 var requestId = _connection.QuerySingle<int>(requestSql, new
                 {
                     request.Client_phone,
                     request.Additional_information,
-                    RequestDate = DateTime.Now
+                    Request_date = DateTime.Now
                 }, transaction);
 
                 foreach (var serviceId in serviceIds)
                 {
-                    AddServiceToRequest(request.Request_id, serviceId);
+                    AddServiceToRequest(requestId, serviceId);
                 }
 
                 transaction.Commit();

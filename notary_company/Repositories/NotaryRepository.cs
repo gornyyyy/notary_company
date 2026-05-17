@@ -18,8 +18,8 @@ namespace notary_company.Repositories
         public int Create(Notary entity)
         {
             const string sql = @"
-                INSERT INTO notaries (user_id, notary_name)
-                VALUES (@UserId, @NotaryName, @NotaryDescription, @NotaryPhone)
+                INSERT INTO notaries (user_id, notary_name, notary_description, notary_phone)
+                VALUES (@User_id, @Notary_name, @Notary_description, @Notary_phone)
                 RETURNING notary_id";
 
             return _connection.QuerySingle<int>(sql, entity);
@@ -45,10 +45,10 @@ namespace notary_company.Repositories
         {
             const string sql = @"
                 UPDATE notaries 
-                SET notary_name = @NotaryName,
-                    notary_description = @NotaryDescription,
-                    notary_phone = @NotaryPhone,
-                WHERE notary_id = @NotaryId";
+                SET notary_name = @Notary_name,
+                    notary_description = @Notary_description,
+                    notary_phone = @Notary_phone,
+                WHERE notary_id = @Notary_id";
 
             _connection.Execute(sql, entity);
         }

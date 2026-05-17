@@ -85,9 +85,26 @@ namespace notary_company
         }
 
         // IClient
-        public void createRequest(string client_phone, string descr, List<int> services_id)
+        public void createRequest(string client_phone, string descr, List<string> services)
         {
+            Client client = new Client();
+            client.Client_phone = client_phone;
+            Clients.Create(client);
 
+            Request request = new Request();
+            request.Client_phone = client_phone;
+            request.Additional_information = descr;
+            request.Request_date = DateTime.Now;
+
+            List<int> serviceIds = new List<int>();
+
+            foreach (string service_name in services) 
+            {
+                Service service = Services.ReadByServiceName(service_name);
+                serviceIds.Add(service.Service_id);
+            }
+
+            Requests.CreateWithServices(request, serviceIds);
         }
         public List<Service> getAllServices()
         {

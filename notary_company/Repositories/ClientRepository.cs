@@ -19,7 +19,7 @@ namespace notary_company.Repositories
         {
             const string sql = @"
                 INSERT INTO clients (client_phone, client_name)
-                VALUES (@ClientPhone, @ClientName)
+                VALUES (@Client_phone, @Client_name)
                 ON CONFLICT (client_phone) DO NOTHING";
 
             return _connection.Execute(sql, entity);
@@ -33,11 +33,10 @@ namespace notary_company.Repositories
 
         public Client ReadById(int id)
         {
-            const string sql = "SELECT * FROM clients WHERE client_phone = @Phone";
-            return _connection.QueryFirstOrDefault<Client>(sql, new { Phone = id.ToString() });
+            throw new NotImplementedException("Используйте ReadByPhone(string phone) для поиска клиента по номеру телефона");
         }
 
-        public Client GetByPhone(string phone)
+        public Client ReadByPhone(string phone)
         {
             const string sql = "SELECT * FROM clients WHERE client_phone = @Phone";
             return _connection.QueryFirstOrDefault<Client>(sql, new { Phone = phone });
@@ -47,16 +46,10 @@ namespace notary_company.Repositories
         {
             const string sql = @"
                 UPDATE clients 
-                SET client_name = @ClientName
-                WHERE client_phone = @ClientPhone";
+                SET client_name = @Client_name
+                WHERE client_phone = @Client_phone";
 
             _connection.Execute(sql, entity);
-        }
-
-        public void Delete(string phone)
-        {
-            const string sql = "DELETE FROM clients WHERE client_phone = @Phone";
-            _connection.Execute(sql, new { Phone = phone });
         }
     }
 }

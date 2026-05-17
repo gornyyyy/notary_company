@@ -7,7 +7,7 @@ namespace notary_company
 {
     public interface IClient
     {
-        public void createRequest(string client_phone, string descr, List<int> services_id);
+        public void createRequest(string client_phone, string descr, List<string> services);
         public List<Service> getAllServices();
 
     }

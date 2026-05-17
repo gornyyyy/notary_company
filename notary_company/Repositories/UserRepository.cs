@@ -19,7 +19,7 @@ namespace notary_company.Repositories
         {
             const string sql = @"
                 INSERT INTO users (login, password_hash)
-                VALUES (@Login, @PasswordHash)
+                VALUES (@Login, @Password_hash)
                 RETURNING user_id";
 
             return _connection.QuerySingle<int>(sql, entity);
@@ -37,22 +37,10 @@ namespace notary_company.Repositories
             return _connection.QueryFirstOrDefault<User>(sql, new { Id = id });
         }
 
-        public User GetByLoginAndPassword(string login, string passwordHash)
-        {
-            const string sql = "SELECT * FROM users WHERE login = @Login AND password_hash = @PasswordHash";
-            return _connection.QueryFirstOrDefault<User>(sql, new { Login = login, PasswordHash = passwordHash });
-        }
-
         public User GetByLogin(string login)
         {
             const string sql = "SELECT * FROM users WHERE login = @Login";
             return _connection.QueryFirstOrDefault<User>(sql, new { Login = login });
-        }
-
-        public void UpdatePassword(int userId, string newPasswordHash)
-        {
-            const string sql = "UPDATE users SET password_hash = @PasswordHash WHERE user_id = @UserId";
-            _connection.Execute(sql, new { UserId = userId, PasswordHash = newPasswordHash });
         }
 
         public void Delete(int userId)

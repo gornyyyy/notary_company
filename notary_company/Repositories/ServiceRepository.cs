@@ -19,7 +19,7 @@ namespace notary_company.Repositories
         {
             const string sql = @"
                 INSERT INTO services (service_name, service_description, service_price)
-                VALUES (@ServiceName, @ServiceDescription, @ServicePrice)
+                VALUES (@Service_name, @Service_description, @Service_price)
                 RETURNING service_id";
 
             return _connection.QuerySingle<int>(sql, entity);
@@ -37,14 +37,19 @@ namespace notary_company.Repositories
             return _connection.QueryFirstOrDefault<Service>(sql, new { Id = id });
         }
 
+        public Service ReadByServiceName(string service_name)
+        {
+            const string sql = "SELECT * FROM services WHERE service_name = @service_name";
+            return _connection.QueryFirstOrDefault<Service>(sql, new { service_name });
+        }
         public void Update(Service entity)
         {
             const string sql = @"
                 UPDATE services 
-                SET service_name = @ServiceName,
-                    service_description = @ServiceDescription,
-                    service_price = @ServicePrice
-                WHERE service_id = @ServiceId";
+                SET service_name = @Service_name,
+                    service_description = @Service_description,
+                    service_price = @Service_price
+                WHERE service_id = @Service_id";
 
             _connection.Execute(sql, entity);
         }
