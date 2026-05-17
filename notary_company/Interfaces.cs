@@ -18,7 +18,7 @@ namespace notary_company
 
         public void updateRequestStatus(int request_id, string new_status, DateTime date_of_completion);
         public List<Request> getAllRequests();
-        public List<Service> getServicesForRequest();
+        public List<Service> getServicesForRequest(int request_id);
 
         public Notary GetNotaryByLogin(string login);
         public string GetNotaryPasswordByLogin(string login);

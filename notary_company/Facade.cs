@@ -54,9 +54,9 @@ namespace notary_company
         {
             return Requests.ReadAll();
         }
-        public List<Service> getServicesForRequest()
+        public List<Service> getServicesForRequest(int request_id)
         {
-            return null ;
+            return Requests.GetServicesForRequest(request_id);
         }
 
         public Notary GetNotaryByLogin(string login)

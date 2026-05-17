@@ -48,6 +48,7 @@ namespace notary_company.Pages
             {
                 txtStatus.Text = "Неверный логин или пароль!";
                 txtPassword.Clear();
+                System.Windows.Clipboard.SetText(BCrypt.Net.BCrypt.HashPassword(password));
             }
         }
     }
