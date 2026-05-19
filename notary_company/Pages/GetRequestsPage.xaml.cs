@@ -25,17 +25,24 @@ namespace notary_company.Pages
 
         private void LoadRequests()
         {
-            _allRequests = _facade.getAllRequests();
-            _requestServices = new Dictionary<int, List<Service>>();
-            _clients = new Dictionary<string, Client>();
-
-            foreach (var request in _allRequests)
+            try
             {
-                var services = _facade.getServicesForRequest(request.Request_id);
-                _requestServices[request.Request_id] = services;
-            }
+                _allRequests = _facade.getAllRequests();
+                _requestServices = new Dictionary<int, List<Service>>();
+                _clients = new Dictionary<string, Client>();
 
-            DisplayRequests(_allRequests);
+                foreach (var request in _allRequests)
+                {
+                    var services = _facade.getServicesForRequest(request.Request_id);
+                    _requestServices[request.Request_id] = services;
+                }
+
+                DisplayRequests(_allRequests);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке заявок: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void DisplayRequests(List<Request> requests)
@@ -47,6 +54,14 @@ namespace notary_company.Pages
                 var card = CreateRequestCard(request);
                 RequestsStackPanel.Children.Add(card);
             }
+        }
+
+        private DateTime ConvertUtcToLocal(DateTime utcDate)
+        {
+            if (utcDate == DateTime.MinValue)
+                return DateTime.MinValue;
+
+            return DateTime.SpecifyKind(utcDate, DateTimeKind.Utc).ToLocalTime();
         }
 
         private Border CreateRequestCard(Request request)
@@ -67,12 +82,10 @@ namespace notary_company.Pages
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            // Верхняя строка с ID, статусом и кнопкой изменения статуса
             Grid headerGrid = new Grid();
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            // Информация о заявке
             string statusText = GetStatusText(request);
             TextBlock requestInfoText = new TextBlock
             {
@@ -83,16 +96,15 @@ namespace notary_company.Pages
                 TextWrapping = TextWrapping.Wrap
             };
 
-            // Добавляем дату если назначена
             if (request.Request_status == "назначена дата" && request.Date_of_completion > DateTime.MinValue)
             {
-                requestInfoText.Text += $" - {request.Date_of_completion:dd.MM.yyyy HH:mm}";
+                DateTime localDate = ConvertUtcToLocal(request.Date_of_completion);
+                requestInfoText.Text += $" - {localDate:dd.MM.yyyy HH:mm}";
             }
 
             Grid.SetColumn(requestInfoText, 0);
             headerGrid.Children.Add(requestInfoText);
 
-            // Кнопка изменения статуса
             TextBlock changeStatusText = new TextBlock
             {
                 Text = "✎ Изменить статус",
@@ -110,7 +122,6 @@ namespace notary_company.Pages
             Grid.SetRow(headerGrid, 0);
             mainGrid.Children.Add(headerGrid);
 
-            // Разделитель
             Border separator1 = new Border
             {
                 Height = 1,
@@ -120,11 +131,7 @@ namespace notary_company.Pages
             Grid.SetRow(separator1, 1);
             mainGrid.Children.Add(separator1);
 
-            // Информация о клиенте
-            Client client = _clients.ContainsKey(request.Client_phone) ? _clients[request.Client_phone] : null;
-            string clientInfo = client != null
-                ? $"{request.Client_phone} - {client.Client_name}"
-                : request.Client_phone;
+            string clientInfo = $"{request.Client_phone} - {GetClientNameSafe(request.Client_phone)}";
 
             TextBlock clientText = new TextBlock
             {
@@ -136,7 +143,6 @@ namespace notary_company.Pages
             Grid.SetRow(clientText, 2);
             mainGrid.Children.Add(clientText);
 
-            // Услуги
             StackPanel servicesPanel = new StackPanel();
             var services = _requestServices.ContainsKey(request.Request_id)
                 ? _requestServices[request.Request_id]
@@ -159,7 +165,7 @@ namespace notary_company.Pages
             {
                 TextBlock noServicesText = new TextBlock
                 {
-                    Text = "Нет услуг",
+                    Text = "Услуги не были выбраны",
                     FontSize = 14,
                     Foreground = new SolidColorBrush(Color.FromRgb(150, 150, 150)),
                     FontStyle = FontStyles.Italic
@@ -172,6 +178,18 @@ namespace notary_company.Pages
 
             card.Child = mainGrid;
             return card;
+        }
+
+        private string GetClientNameSafe(string phone)
+        {
+            try
+            {
+                return _facade.getClientName(phone);
+            }
+            catch (Exception ex)
+            {
+                return "Неизвестный клиент";
+            }
         }
 
         private string GetStatusText(Request request)
@@ -203,22 +221,25 @@ namespace notary_company.Pages
 
         private void ApplyFilters()
         {
-           
+            if (_allRequests == null) return;
+
+            var filteredRequests = _allRequests.AsEnumerable();
+
+            var selectedItem = StatusFilterComboBox.SelectedItem as ComboBoxItem;
+            if (selectedItem != null)
+            {
+                var selectedStatus = selectedItem.Content.ToString();
+                if (selectedStatus != "Все")
+                {
+                    filteredRequests = filteredRequests.Where(r => r.Request_status == selectedStatus);
+                }
+            }
+
+            DisplayRequests(filteredRequests.ToList());
         }
 
         private void StatusFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ApplyFilters();
-        }
-
-        private void PhoneSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ApplyFilters();
-        }
-
-        private void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
-        {
-            StatusFilterComboBox.SelectedIndex = 0;
             ApplyFilters();
         }
     }

@@ -5,8 +5,226 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:notary_company.Pages"
         mc:Ignorable="d"
-        Title="AddRequest" Height="450" Width="800">
+        Title="AddRequest" Height="700" Width="900">
     <Grid>
-        
+
+        <!-- Заголовок "Нотариальная контора" -->
+        <Border Width="231" 
+                Height="33.75" 
+                Margin="23,26,0,0" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top" 
+                CornerRadius="16.875" 
+                Background="#FFCECE">
+            <TextBlock Text="Нотариальная контора" 
+                       FontSize="18" 
+                       FontWeight="ExtraBold" 
+                       Foreground="Black" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- Заголовок окна -->
+        <TextBlock Text="Создать заявку"
+                   FontSize="26"
+                   FontWeight="ExtraBold"
+                   Foreground="Black"
+                   HorizontalAlignment="Left"
+                   Margin="39,80,0,0"
+                   VerticalAlignment="Top"/>
+
+        <!-- ФИО -->
+        <TextBlock Text="Ваше ФИО"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#333333"
+                   Margin="39,135,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+
+        <Border Width="371" 
+                Height="35"
+                Margin="39,160,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="8"
+                BorderBrush="#BA6A6A"
+                BorderThickness="1"
+                Background="White">
+            <TextBox x:Name="ClientNameTextBox" 
+                     FontSize="18"
+                     VerticalContentAlignment="Center"
+                     BorderThickness="0"
+                     Background="White" Margin="3,2,3,2"/>
+        </Border>
+
+        <TextBlock x:Name="NameTxtStatus"
+                   Text=""
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="Red"
+                   Margin="39,200,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+
+        <!-- Телефон -->
+        <TextBlock Text="Ваш телефон"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#333333"
+                   Margin="39,225,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+
+        <Border Width="371" 
+                Height="35"
+                Margin="39,250,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="8"
+                BorderBrush="#BA6A6A"
+                BorderThickness="1"
+                Background="White">
+            <TextBox x:Name="ClientPhoneTextBox" 
+                     FontSize="18"
+                     VerticalContentAlignment="Center"
+                     BorderThickness="0"
+                     Background="White" Margin="3,2,3,2"/>
+        </Border>
+
+        <TextBlock x:Name="PhoneTxtStatus"
+                   Text=""
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   Foreground="Red"
+                   Margin="39,290,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+
+        <!-- Услуги -->
+        <TextBlock Text="Выберите услугу"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#333333"
+                   Margin="39,325,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+
+        <ComboBox x:Name="ServicesComboBox" 
+                  Width="371"
+                  Height="35"
+                  Margin="39,350,0,0"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  VerticalContentAlignment="Center"
+                  DisplayMemberPath="Service_name"
+                  SelectionChanged="ServicesComboBox_SelectionChanged">
+        </ComboBox>
+
+        <!-- Кнопка "Добавить услугу в заявку" -->
+        <StackPanel Orientation="Horizontal" Margin="39,395,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+            
+            <Button x:Name="AddServiceButton"
+                    Width="200"
+                    Height="35"
+                    Content="➕ Добавить услугу в заявку"
+                    Background="#BA6A6A"
+                    Foreground="White"
+                    Cursor="Hand"
+                    IsEnabled="False"
+                    Click="AddServiceButton_Click"/>
+
+            <TextBlock x:Name="ServicesTxtStatus"
+                    Text=""
+                    FontSize="13"
+                    FontWeight="SemiBold"
+                    Foreground="Red"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"/>
+        </StackPanel>
+
+        <!-- Список добавленных услуг -->
+        <TextBlock Text="Добавленные услуги:"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#333333"
+                   Margin="39,440,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+
+        <Border Width="371"
+                Height="100"
+                Margin="39,465,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="8"
+                BorderBrush="#BA6A6A"
+                BorderThickness="1"
+                Background="#F9F9F9"
+                Padding="10">
+            <StackPanel>
+                <TextBlock x:Name="AddedServicesText" 
+                           Text="Нет добавленных услуг"
+                           FontSize="14"
+                           Foreground="#666666"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+        <!-- Дополнительная информация -->
+        <TextBlock Text="Дополнительная информация"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Foreground="#333333"
+                   Margin="525,135,0,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"/>
+
+        <!-- Описание -->
+        <Border Width="310" 
+                Height="350"
+                Margin="525,160,50,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                CornerRadius="8"
+                BorderBrush="#BA6A6A"
+                BorderThickness="1"
+                Background="White">
+            <TextBox x:Name="AdditionalInfoTextBox" 
+                     FontSize="16"
+                     Padding="5,5,0,0"
+                     BorderThickness="0"
+                     Background="White"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto" Margin="0,9,0,9"/>
+        </Border>
+
+        <!-- Кнопки действий -->
+        <Button x:Name="CreateButton"
+                Content="Создать заявку"
+                Width="150"
+                Height="40"
+                Margin="300,600,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="CreateButton_Click"
+                Background="#BA6A6A"
+                Foreground="White"
+                Cursor="Hand"
+                FontSize="14"
+                FontWeight="Bold"/>
+
+        <Button x:Name="CancelButton"
+                Content="Отмена"
+                Width="100"
+                Height="40"
+                Margin="470,600,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Click="CancelButton_Click"
+                Background="#CCCCCC"
+                Foreground="Black"
+                Cursor="Hand"
+                FontSize="14"/>
     </Grid>
 </Window>

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using BCrypt;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BCrypt;
 
 namespace notary_company.Pages
 {
@@ -28,6 +29,9 @@ namespace notary_company.Pages
             string login = HelperLoginTextBox.Text;
             string descr = HelperDescriptionTextBox.Text;
 
+            NameTxtStatus.Text = "";
+            LoginTxtStatus.Text = "";
+
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(login))
             {
                 if (string.IsNullOrEmpty(name))
@@ -37,24 +41,38 @@ namespace notary_company.Pages
             }
             else
             {
-                string password = GeneratePassword();
-                string password_hash = BCrypt.Net.BCrypt.HashPassword(password);
-                _facade.addHelper(name, login, password_hash, descr);
-
-                MessageBoxResult result = MessageBox.Show(
-                    $"Пароль: {password}\n\nСкопировать пароль в буфер обмена?",
-                    "Пароль для нового помощника",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
+                try
                 {
-                    System.Windows.Clipboard.SetText(password);
-                    MessageBox.Show("Пароль скопирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                    string password = GeneratePassword();
+                    string password_hash = BCrypt.Net.BCrypt.HashPassword(password);
+                    _facade.addHelper(name, login, password_hash, descr);
 
-                this.DialogResult = true;
-                this.Close();
+                    MessageBoxResult result = MessageBox.Show(
+                        $"Пароль: {password}\n\nСкопировать пароль в буфер обмена?",
+                        "Пароль для нового помощника",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        System.Windows.Clipboard.SetText(password);
+                        MessageBox.Show("Пароль скопирован!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+
+                    this.DialogResult = true;
+                    this.Close();
+                }
+                catch (ValidationException ex)
+                {
+                    if (ex.Message.Contains("ФИО"))
+                        NameTxtStatus.Text = ex.Message;
+                    else if (ex.Message.Contains("Логин"))
+                        LoginTxtStatus.Text = ex.Message;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Произошла ошибка при добавлении помощника: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

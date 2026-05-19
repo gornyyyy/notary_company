@@ -7,7 +7,7 @@ namespace notary_company
 {
     public interface IClient
     {
-        public void createRequest(string client_phone, string descr, List<string> services);
+        public void createRequest(string client_phone, string client_name, string? descr, List<string> services);
         public List<Service> getAllServices();
 
     }
@@ -16,7 +16,7 @@ namespace notary_company
     {
         public void addHelper(string name, string login, string passwordhash, string descr);
 
-        public void updateRequestStatus(int request_id, string new_status, DateTime date_of_completion);
+        public void updateRequestStatus(int request_id, string new_status, DateTime? date_of_completion);
         public List<Request> getAllRequests();
         public List<Service> getServicesForRequest(int request_id);
 

@@ -34,17 +34,6 @@
                     <ComboBoxItem Content="отказано"/>
                 </ComboBox>
 
-                
-
-                <Button x:Name="ClearFiltersButton"
-                        Content="Сбросить фильтры"
-                        Width="120"
-                        Height="30"
-                        Margin="20,0,0,0"
-                        Click="ClearFiltersButton_Click"
-                        Background="#BA6A6A"
-                        Foreground="White"
-                        Cursor="Hand"/>
             </StackPanel>
         </Border>
 

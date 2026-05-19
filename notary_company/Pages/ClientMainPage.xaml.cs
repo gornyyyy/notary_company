@@ -31,17 +31,18 @@ namespace notary_company.Pages
 
         private void BtnCreateRequest_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: открыть страницу подачи заявки
+            AddRequest addRequest = new AddRequest();
+            addRequest.Owner = Window.GetWindow(this);
+            bool? result = addRequest.ShowDialog();
         }
 
         private void BtnMyRequests_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: открыть страницу с заявками клиента
+
         }
 
         private void Logo_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Возвращаемся на главную информационную страницу
             ContentFrame.Navigate(new MainInfoPage());
         }
     }

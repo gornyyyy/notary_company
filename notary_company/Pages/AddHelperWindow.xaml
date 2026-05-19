@@ -13,8 +13,6 @@
         Background="White">
 
     <Grid>
-        <!-- Фоновый прямоугольник -->
-        <Rectangle Fill="White"/>
 
         <!-- Заголовок "Нотариальная контора" -->
         <Border Width="231" 

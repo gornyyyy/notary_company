@@ -1,5 +1,6 @@
 ﻿using notary_company.Models;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,15 +17,44 @@ namespace notary_company.Pages
             _request = request;
             _facade = facade;
 
-            // Устанавливаем текущий статус
-            foreach (ComboBoxItem item in StatusComboBox.Items)
+            try
             {
-                if (item.Content.ToString() == _request.Request_status)
+                foreach (ComboBoxItem item in StatusComboBox.Items)
                 {
-                    StatusComboBox.SelectedItem = item;
-                    break;
+                    if (item.Content.ToString() == _request.Request_status)
+                    {
+                        StatusComboBox.SelectedItem = item;
+                        break;
+                    }
+                }
+
+                if (_request.Date_of_completion > DateTime.MinValue)
+                {
+                    DateTime localDate = ConvertUtcToLocal(_request.Date_of_completion);
+                    DatePicker.SelectedDate = localDate.Date;
+                    TimeTextBox.Text = localDate.ToString("HH:mm");
                 }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке статуса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private DateTime ConvertUtcToLocal(DateTime utcDate)
+        {
+            if (utcDate == DateTime.MinValue)
+                return DateTime.MinValue;
+
+            return DateTime.SpecifyKind(utcDate, DateTimeKind.Utc).ToLocalTime();
+        }
+
+        private DateTime ConvertLocalToUtc(DateTime localDate)
+        {
+            if (localDate == DateTime.MinValue)
+                return DateTime.MinValue;
+
+            return DateTime.SpecifyKind(localDate, DateTimeKind.Local).ToUniversalTime();
         }
 
         private void StatusComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -46,7 +76,7 @@ namespace notary_company.Pages
             try
             {
                 var selectedStatus = (StatusComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
-                DateTime? assignedDate = null;
+                DateTime? assignedDateUtc = null;
 
                 if (selectedStatus == "назначена дата")
                 {
@@ -58,11 +88,12 @@ namespace notary_company.Pages
 
                         if (timeParts.Length == 2 && int.TryParse(timeParts[0], out int hour) && int.TryParse(timeParts[1], out int minute))
                         {
-                            assignedDate = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+                            DateTime localDateTime = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+                            assignedDateUtc = ConvertLocalToUtc(localDateTime);
                         }
                         else
                         {
-                            assignedDate = date;
+                            assignedDateUtc = ConvertLocalToUtc(date);
                         }
                     }
                     else
@@ -72,10 +103,14 @@ namespace notary_company.Pages
                     }
                 }
 
-                _facade.updateRequestStatus(_request.Request_id, selectedStatus, (DateTime)assignedDate);
+                _facade.updateRequestStatus(_request.Request_id, selectedStatus, assignedDateUtc);
                 MessageBox.Show("Статус успешно изменен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 DialogResult = true;
                 Close();
+            }
+            catch (ValidationException ex)
+            {
+                MessageBox.Show($"Ошибка валидации: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
