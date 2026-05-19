@@ -89,7 +89,10 @@
                      FontSize="18"
                      VerticalContentAlignment="Center"
                      BorderThickness="0"
-                     Background="White" Margin="3,2,3,2"/>
+                     Background="White" Margin="3,2,3,2"
+                     PreviewTextInput="ClientPhoneTextBox_PreviewTextInput"
+                     TextChanged="ClientPhoneTextBox_TextChanged"
+                     MaxLength="15"/>
         </Border>
 
         <TextBlock x:Name="PhoneTxtStatus"

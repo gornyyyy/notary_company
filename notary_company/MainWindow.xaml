@@ -17,6 +17,8 @@
 
         <!-- Контент для страниц -->
         <Frame x:Name="MainFrame" 
-               NavigationUIVisibility="Hidden"/>
+               NavigationUIVisibility="Hidden"
+               HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch"/>
     </Grid>
 </Window>

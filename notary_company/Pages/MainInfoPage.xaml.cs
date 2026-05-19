@@ -87,7 +87,28 @@ namespace notary_company.Pages
             };
             stackPanel.Children.Add(descriptionText);
 
-            
+            TextBlock contactsTitle = new TextBlock
+            {
+                Text = "Контакты:",
+                FontSize = 14,
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush(Color.FromRgb(51, 51, 51)),
+                TextAlignment = TextAlignment.Left,
+                Margin = new Thickness(0, 10, 0, 5)
+            };
+            stackPanel.Children.Add(contactsTitle);
+
+            TextBlock phoneText = new TextBlock
+            {
+                Text = $"Телефон: {(notary.Notary_phone ?? "Не указан")}",
+                FontSize = 14,
+                Foreground = new SolidColorBrush(Color.FromRgb(102, 102, 102)),
+                TextAlignment = TextAlignment.Left,
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 3)
+            };
+            stackPanel.Children.Add(phoneText);
+
             card.Child = stackPanel;
 
             return card;

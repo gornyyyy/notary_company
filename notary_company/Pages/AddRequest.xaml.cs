@@ -19,7 +19,10 @@ namespace notary_company.Pages
             _facade = App.Facade;
 
             _selectedServices = new List<string>();
+
             LoadServices();
+
+            ClientPhoneTextBox.Text = "8";
         }
 
         private void LoadServices()
@@ -88,6 +91,16 @@ namespace notary_company.Pages
             string phone = ClientPhoneTextBox.Text;
             string services = AddedServicesText.Text;
 
+            phone = new string(phone.Where(char.IsDigit).ToArray());
+
+            bool isValid = true;
+
+            if (phone.Length != 11)
+            {
+                PhoneTxtStatus.Text = "Введите 11 цифр номера телефона";
+                isValid = false;
+            }
+
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(phone) || services == "Нет добавленных услуг")
             {
                 if (string.IsNullOrEmpty(name))
@@ -96,24 +109,103 @@ namespace notary_company.Pages
                     PhoneTxtStatus.Text = "Обязательное поле";
                 if (services == "Нет добавленных услуг")
                     ServicesTxtStatus.Text = "Выберите хотя бы одну услугу";
+                isValid = false;
             }
-            else
+
+            if (!isValid)
+                return;
+
+            try
             {
-                try
-                {
-                    string descr = AdditionalInfoTextBox.Text;
-                    _facade.createRequest(phone, name, descr, _selectedServices);
+                string descr = AdditionalInfoTextBox.Text;
 
-                    MessageBox.Show("Ваша заявка подана.\nC вами скоро свяжутся.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                _facade.createRequest(phone, name, descr, _selectedServices);
 
-                    this.DialogResult = true;
-                    this.Close();
-                }
-                catch (Exception ex)
+                MessageBox.Show("Ваша заявка подана.\nC вами скоро свяжутся.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                this.DialogResult = true;
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка при создании заявки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
+        }
+
+        private void ClientPhoneTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            foreach (char ch in e.Text)
+            {
+                if (!char.IsDigit(ch))
                 {
-                    MessageBox.Show($"Произошла ошибка при создании заявки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    e.Handled = true;
+                    return;
                 }
             }
+
+            string currentText = ClientPhoneTextBox.Text;
+            string digits = new string(currentText.Where(char.IsDigit).ToArray());
+
+            if (digits.Length >= 11)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void ClientPhoneTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            int cursorPosition = ClientPhoneTextBox.CaretIndex;
+
+            string digits = new string(ClientPhoneTextBox.Text.Where(char.IsDigit).ToArray());
+
+            if (digits.Length > 11)
+                digits = digits.Substring(0, 11);
+
+            if (digits.Length > 0 && digits[0] != '8')
+            {
+                digits = "8" + (digits.Length > 1 ? digits.Substring(1) : "");
+            }
+
+            string formattedPhone = FormatPhoneWithSpaces(digits);
+
+            if (ClientPhoneTextBox.Text != formattedPhone)
+            {
+                ClientPhoneTextBox.Text = formattedPhone;
+
+                if (cursorPosition <= ClientPhoneTextBox.Text.Length)
+                    ClientPhoneTextBox.CaretIndex = cursorPosition;
+                else
+                    ClientPhoneTextBox.CaretIndex = ClientPhoneTextBox.Text.Length;
+            }
+
+            int newPosition = 0; if (newPosition == 0)
+                newPosition = formattedPhone.Length;
+
+            if (newPosition == 0)
+                newPosition = 1;
+
+            if (newPosition < formattedPhone.Length && formattedPhone[newPosition] == ' ')
+                newPosition++;
+
+            ClientPhoneTextBox.CaretIndex = newPosition;
+        }
+
+        private string FormatPhoneWithSpaces(string digits)
+        {
+            if (string.IsNullOrEmpty(digits))
+                return "";
+
+            if (digits.Length == 1)
+                return digits;
+            else if (digits.Length <= 4)
+                return $"{digits.Substring(0, 1)} {digits.Substring(1)}";
+            else if (digits.Length <= 7)
+                return $"{digits.Substring(0, 1)} {digits.Substring(1, 3)} {digits.Substring(4)}";
+            else if (digits.Length <= 9)
+                return $"{digits.Substring(0, 1)} {digits.Substring(1, 3)} {digits.Substring(4, 3)} {digits.Substring(7)}";
+            else
+                return $"{digits.Substring(0, 1)} {digits.Substring(1, 3)} {digits.Substring(4, 3)} {digits.Substring(7, 2)} {digits.Substring(9)}";
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

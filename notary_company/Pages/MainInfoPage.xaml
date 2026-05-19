@@ -4,7 +4,7 @@
       Title="MainInfoPage"
       Background="#F5F5F5">
 
-    <Grid Margin="20">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -13,8 +13,7 @@
         <ScrollViewer Grid.Row="1" 
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
-            <StackPanel x:Name="NotariesStackPanel" 
-                        Margin="0,0,0,20"/>
+            <StackPanel x:Name="NotariesStackPanel" Margin="25,30,25,0"/>
         </ScrollViewer>
     </Grid>
 </Page>
