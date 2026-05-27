@@ -7,9 +7,6 @@ using System.Windows;
 
 namespace notary_company
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         public static Facade Facade { get; private set; }
@@ -30,7 +27,12 @@ namespace notary_company
 
                 Facade = new Facade(connection);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                MessageBox.Show($"Ошибка запуска: {ex.Message}", "Критическая ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(1);
+            }
         }
 
         private void App_Exit(object sender, EventArgs e)

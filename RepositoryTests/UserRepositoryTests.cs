@@ -2,7 +2,7 @@
 using notary_company.Repositories;
 using notary_company.Models;
 
-namespace RepositoryTests
+namespace TestProj
 {
     [TestClass]
     public class UserRepositoryTests : RepositoryTestBase
@@ -10,8 +10,9 @@ namespace RepositoryTests
         private UserRepository _repo;
 
         [TestInitialize]
-        public void Setup()
+        public new void TestInitialize()
         {
+            base.TestInitialize();
             _repo = new UserRepository(Connection);
         }
 
@@ -20,7 +21,7 @@ namespace RepositoryTests
         {
             var user = new User
             {
-                Login = $"{Guid.NewGuid()}@test.com",
+                Login = $"{Guid.NewGuid():N}@test.com",
                 Password_hash = "hash123"
             };
 
@@ -34,7 +35,7 @@ namespace RepositoryTests
         {
             var user = new User
             {
-                Login = $"{Guid.NewGuid()}@test.com",
+                Login = $"{Guid.NewGuid():N}@test.com",
                 Password_hash = "hash123"
             };
             var id = _repo.Create(user);
@@ -48,8 +49,8 @@ namespace RepositoryTests
         [TestMethod]
         public void ReadAll_ShouldReturnAllUsers()
         {
-            var login1 = $"{Guid.NewGuid()}@test.com";
-            var login2 = $"{Guid.NewGuid()}@test.com";
+            var login1 = $"{Guid.NewGuid():N}@test.com";
+            var login2 = $"{Guid.NewGuid():N}@test.com";
 
             _repo.Create(new User { Login = login1, Password_hash = "hash1" });
             _repo.Create(new User { Login = login2, Password_hash = "hash2" });
@@ -63,7 +64,7 @@ namespace RepositoryTests
         [TestMethod]
         public void GetByLogin_ShouldReturnUser()
         {
-            var login = $"{Guid.NewGuid()}@test.com";
+            var login = $"{Guid.NewGuid():N}@test.com";
             var user = new User
             {
                 Login = login,
@@ -82,7 +83,7 @@ namespace RepositoryTests
         {
             var user = new User
             {
-                Login = $"{Guid.NewGuid()}@test.com",
+                Login = $"{Guid.NewGuid():N}@test.com",
                 Password_hash = "hash123"
             };
             var id = _repo.Create(user);

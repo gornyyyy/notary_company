@@ -12,7 +12,6 @@ namespace notary_company.Models
     {
         public int Request_id { get; set; }
         public string Client_phone { get; set; }
-        public decimal Total_approximate_price { get; set; }
         public string Additional_information { get; set; }
         public string Request_status { get; set; }
         public DateTime Request_date { get; set; }

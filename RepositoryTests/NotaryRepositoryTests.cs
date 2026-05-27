@@ -2,7 +2,7 @@
 using notary_company.Repositories;
 using notary_company.Models;
 
-namespace RepositoryTests
+namespace TestProj
 {
     [TestClass]
     public class NotaryRepositoryTests : RepositoryTestBase
@@ -11,19 +11,21 @@ namespace RepositoryTests
         private UserRepository _userRepo;
 
         [TestInitialize]
-        public void Setup()
+        public new void TestInitialize()
         {
+            base.TestInitialize();
             _repo = new NotaryRepository(Connection);
             _userRepo = new UserRepository(Connection);
         }
 
         private int CreateTestUser()
         {
-            return _userRepo.Create(new User
+            var user = new User
             {
-                Login = $"{Guid.NewGuid()}@test.com",
+                Login = $"{Guid.NewGuid():N}@test.com",
                 Password_hash = "hash"
-            });
+            };
+            return _userRepo.Create(user);
         }
 
         [TestMethod]
@@ -33,8 +35,8 @@ namespace RepositoryTests
             var notary = new Notary
             {
                 User_id = userId,
-                Notary_name = $"Нотариус_{Guid.NewGuid()}",
-                Notary_phone = Guid.NewGuid().ToString().Substring(0, 11)
+                Notary_name = $"Нотариус_{Guid.NewGuid():N}",
+                Notary_phone = UniquePhone()
             };
 
             var id = _repo.Create(notary);
@@ -46,12 +48,12 @@ namespace RepositoryTests
         public void ReadById_ShouldReturnNotary()
         {
             var userId = CreateTestUser();
-            var notaryName = $"Нотариус_{Guid.NewGuid()}";
+            var notaryName = $"Нотариус_{Guid.NewGuid():N}";
             var notary = new Notary
             {
                 User_id = userId,
                 Notary_name = notaryName,
-                Notary_phone = Guid.NewGuid().ToString().Substring(0, 11)
+                Notary_phone = UniquePhone()
             };
             var id = _repo.Create(notary);
 
@@ -66,11 +68,11 @@ namespace RepositoryTests
         {
             var userId1 = CreateTestUser();
             var userId2 = CreateTestUser();
-            var name1 = $"Нотариус_{Guid.NewGuid()}";
-            var name2 = $"Нотариус_{Guid.NewGuid()}";
+            var name1 = $"Нотариус_{Guid.NewGuid():N}";
+            var name2 = $"Нотариус_{Guid.NewGuid():N}";
 
-            _repo.Create(new Notary { User_id = userId1, Notary_name = name1 });
-            _repo.Create(new Notary { User_id = userId2, Notary_name = name2 });
+            _repo.Create(new Notary { User_id = userId1, Notary_name = name1, Notary_phone = UniquePhone() });
+            _repo.Create(new Notary { User_id = userId2, Notary_name = name2, Notary_phone = UniquePhone() });
 
             var result = _repo.ReadAll();
             var ourNotaries = result.Where(n => n.Notary_name == name1 || n.Notary_name == name2).ToList();
@@ -82,11 +84,12 @@ namespace RepositoryTests
         public void ReadByUserId_ShouldReturnNotary()
         {
             var userId = CreateTestUser();
-            var notaryName = $"Нотариус_{Guid.NewGuid()}";
+            var notaryName = $"Нотариус_{Guid.NewGuid():N}";
             var notary = new Notary
             {
                 User_id = userId,
-                Notary_name = notaryName
+                Notary_name = notaryName,
+                Notary_phone = UniquePhone()
             };
             _repo.Create(notary);
 
@@ -95,5 +98,7 @@ namespace RepositoryTests
             Assert.IsNotNull(result);
             Assert.AreEqual(userId, result.User_id);
         }
+
+        private static string UniquePhone() => Guid.NewGuid().ToString("N")[..11];
     }
 }

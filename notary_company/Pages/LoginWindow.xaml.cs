@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.ComponentModel.DataAnnotations;
 using BCrypt.Net;
 using notary_company.Models;
 
@@ -30,25 +21,32 @@ namespace notary_company.Pages
 
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-            string login = txtLogin.Text;
-            string password = txtPassword.Password;
-
-            string passwordhash = _facade.GetNotaryPasswordByLogin(login);
-
-            if (passwordhash != null && BCrypt.Net.BCrypt.Verify(password, passwordhash))
+            try
             {
-                
-                _mainWindow.Notary = _facade.GetNotaryByLogin(login);
-                _mainWindow.SwitchToNotaryPage(_mainWindow.Notary.Notary_name);
+                string login = txtLogin.Text;
+                string password = txtPassword.Password;
 
-                this.DialogResult = true;
-                this.Close();
+                string passwordhash = _facade.GetNotaryPasswordByLogin(login);
+
+                if (passwordhash != null && BCrypt.Net.BCrypt.Verify(password, passwordhash))
+                {
+
+                    _mainWindow.Notary = _facade.GetNotaryByLogin(login);
+                    _mainWindow.SwitchToNotaryPage(_mainWindow.Notary.Notary_name);
+
+                    this.DialogResult = true;
+                    this.Close();
+                }
+                else
+                {
+                    txtStatus.Text = "Неверный логин или пароль!";
+                    txtPassword.Clear();
+                    System.Windows.Clipboard.SetText(BCrypt.Net.BCrypt.HashPassword(password));
+                }
             }
-            else
+            catch(Exception ex)
             {
-                txtStatus.Text = "Неверный логин или пароль!";
-                txtPassword.Clear();
-                System.Windows.Clipboard.SetText(BCrypt.Net.BCrypt.HashPassword(password));
+                MessageBox.Show($"Ошибка: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

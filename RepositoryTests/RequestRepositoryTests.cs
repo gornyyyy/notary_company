@@ -5,7 +5,7 @@ using notary_company.Repositories;
 using System;
 using System.Linq;
 
-namespace RepositoryTests
+namespace TestProj
 {
     [TestClass]
     public class RequestRepositoryTests : RepositoryTestBase
@@ -14,18 +14,16 @@ namespace RepositoryTests
         private ClientRepository _clientRepo;
 
         [TestInitialize]
-        public void Setup()
+        public new void TestInitialize()
         {
+            base.TestInitialize();
             _repo = new RequestRepository(Connection);
             _clientRepo = new ClientRepository(Connection);
-            // Очищаем таблицы перед каждым тестом
-            Connection.Execute("DELETE FROM requests");
-            Connection.Execute("DELETE FROM clients");
         }
 
         private string CreateTestClient()
         {
-            var phone = Guid.NewGuid().ToString().Substring(0, 11);
+            var phone = UniquePhone();
             _clientRepo.Create(new Client { Client_phone = phone, Client_name = "Клиент" });
             return phone;
         }
@@ -97,7 +95,7 @@ namespace RepositoryTests
             var updated = _repo.ReadById(id);
 
             Assert.AreEqual("назначена дата", updated.Request_status);
-            Assert.AreEqual(assignedDate.Date, updated.Date_of_completion.Date); //только дата
+            Assert.AreEqual(assignedDate.Date, updated.Date_of_completion.Date);
         }
 
         [TestMethod]
@@ -113,6 +111,6 @@ namespace RepositoryTests
             Assert.AreEqual(2, result.Count);
         }
 
-        
+        private static string UniquePhone() => Guid.NewGuid().ToString("N")[..11];
     }
 }

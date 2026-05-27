@@ -2,7 +2,7 @@
 using notary_company.Repositories;
 using notary_company.Models;
 
-namespace RepositoryTests
+namespace TestProj
 {
     [TestClass]
     public class ServiceRepositoryTests : RepositoryTestBase
@@ -10,8 +10,9 @@ namespace RepositoryTests
         private ServiceRepository _repo;
 
         [TestInitialize]
-        public void Setup()
+        public new void TestInitialize()
         {
+            base.TestInitialize();
             _repo = new ServiceRepository(Connection);
         }
 
@@ -20,7 +21,7 @@ namespace RepositoryTests
         {
             var service = new Service
             {
-                Service_name = $"Услуга_{Guid.NewGuid()}",
+                Service_name = $"Услуга_{Guid.NewGuid():N}",
                 Service_description = "Описание услуги",
                 Service_price = 1000.00m
             };
@@ -35,7 +36,7 @@ namespace RepositoryTests
         {
             var service = new Service
             {
-                Service_name = $"Услуга_{Guid.NewGuid()}",
+                Service_name = $"Услуга_{Guid.NewGuid():N}",
                 Service_description = "Описание услуги",
                 Service_price = 1000.00m
             };
@@ -50,8 +51,8 @@ namespace RepositoryTests
         [TestMethod]
         public void ReadAll_ShouldReturnAllServices()
         {
-            var name1 = $"Услуга_{Guid.NewGuid()}";
-            var name2 = $"Услуга_{Guid.NewGuid()}";
+            var name1 = $"Услуга_{Guid.NewGuid():N}";
+            var name2 = $"Услуга_{Guid.NewGuid():N}";
 
             _repo.Create(new Service { Service_name = name1, Service_price = 100 });
             _repo.Create(new Service { Service_name = name2, Service_price = 200 });
@@ -67,13 +68,13 @@ namespace RepositoryTests
         {
             var service = new Service
             {
-                Service_name = $"Старое_{Guid.NewGuid()}",
+                Service_name = $"Старое_{Guid.NewGuid():N}",
                 Service_description = "Старое описание",
                 Service_price = 1000.00m
             };
             var id = _repo.Create(service);
             service.Service_id = id;
-            service.Service_name = $"Новое_{Guid.NewGuid()}";
+            service.Service_name = $"Новое_{Guid.NewGuid():N}";
 
             _repo.Update(service);
             var updated = _repo.ReadById(id);
@@ -86,7 +87,7 @@ namespace RepositoryTests
         {
             var service = new Service
             {
-                Service_name = $"Услуга_{Guid.NewGuid()}",
+                Service_name = $"Услуга_{Guid.NewGuid():N}",
                 Service_price = 1000.00m
             };
             var id = _repo.Create(service);
@@ -100,7 +101,7 @@ namespace RepositoryTests
         [TestMethod]
         public void ReadByServiceName_ShouldReturnService()
         {
-            var name = $"Уникальное_имя_{Guid.NewGuid()}";
+            var name = $"Уникальное_{Guid.NewGuid():N}";
             var service = new Service
             {
                 Service_name = name,

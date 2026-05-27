@@ -242,5 +242,7 @@ namespace notary_company.Pages
         {
             ApplyFilters();
         }
+
+        // сделать кнопку reset для обновления 
     }
 }
