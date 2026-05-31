@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict X3fFlfaKs8Me1986SPkY08f9dd05VK9gj9nKT6BBI3XHEZMTc6f71N0cQKRghJc
+\restrict 2n2mL4SHpKC887TMQnSOQYRJLa6YXEAnbyMU3yxL2z365o1AlVJiynucgYMfeWR
 
 -- Dumped from database version 17.7
 -- Dumped by pg_dump version 17.7
 
--- Started on 2026-05-31 22:35:44
+-- Started on 2026-05-31 23:07:09
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -26,7 +26,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 217 (class 1259 OID 41767)
+-- TOC entry 217 (class 1259 OID 42080)
 -- Name: clients; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -39,7 +39,7 @@ CREATE TABLE public.clients (
 ALTER TABLE public.clients OWNER TO postgres;
 
 --
--- TOC entry 218 (class 1259 OID 41770)
+-- TOC entry 227 (class 1259 OID 42144)
 -- Name: notaries; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -49,14 +49,14 @@ CREATE TABLE public.notaries (
     notary_name character varying(100) NOT NULL,
     notary_description text,
     notary_phone character varying(20),
-    is_notary_helper boolean DEFAULT true
+    is_notary_helper boolean DEFAULT false
 );
 
 
 ALTER TABLE public.notaries OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 41776)
+-- TOC entry 226 (class 1259 OID 42143)
 -- Name: notaries_notary_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -72,8 +72,8 @@ CREATE SEQUENCE public.notaries_notary_id_seq
 ALTER SEQUENCE public.notaries_notary_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4965 (class 0 OID 0)
--- Dependencies: 219
+-- TOC entry 4966 (class 0 OID 0)
+-- Dependencies: 226
 -- Name: notaries_notary_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -81,7 +81,7 @@ ALTER SEQUENCE public.notaries_notary_id_seq OWNED BY public.notaries.notary_id;
 
 
 --
--- TOC entry 220 (class 1259 OID 41777)
+-- TOC entry 223 (class 1259 OID 42116)
 -- Name: request_services; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -95,7 +95,7 @@ CREATE TABLE public.request_services (
 ALTER TABLE public.request_services OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 41780)
+-- TOC entry 222 (class 1259 OID 42115)
 -- Name: request_services_request_detail_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -111,8 +111,8 @@ CREATE SEQUENCE public.request_services_request_detail_id_seq
 ALTER SEQUENCE public.request_services_request_detail_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4966 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 4967 (class 0 OID 0)
+-- Dependencies: 222
 -- Name: request_services_request_detail_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -120,25 +120,26 @@ ALTER SEQUENCE public.request_services_request_detail_id_seq OWNED BY public.req
 
 
 --
--- TOC entry 222 (class 1259 OID 41781)
+-- TOC entry 219 (class 1259 OID 42086)
 -- Name: requests; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.requests (
     request_id integer NOT NULL,
     client_phone character varying(20) NOT NULL,
+    total_approximate_price numeric(10,2) DEFAULT 0,
     additional_information text,
     request_status character varying(20) DEFAULT 'ожидание'::character varying,
     request_date timestamp with time zone DEFAULT CURRENT_DATE,
     date_of_completion timestamp with time zone,
-    CONSTRAINT check_request_status CHECK (((request_status)::text = ANY (ARRAY[('ожидание'::character varying)::text, ('отказано'::character varying)::text, ('выполнено'::character varying)::text, ('назначена дата'::character varying)::text])))
+    CONSTRAINT check_request_status CHECK (((request_status)::text = ANY ((ARRAY['ожидание'::character varying, 'отказано'::character varying, 'выполнено'::character varying, 'назначена дата'::character varying])::text[])))
 );
 
 
 ALTER TABLE public.requests OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 41789)
+-- TOC entry 218 (class 1259 OID 42085)
 -- Name: requests_request_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -154,8 +155,8 @@ CREATE SEQUENCE public.requests_request_id_seq
 ALTER SEQUENCE public.requests_request_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4967 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 4968 (class 0 OID 0)
+-- Dependencies: 218
 -- Name: requests_request_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -163,7 +164,7 @@ ALTER SEQUENCE public.requests_request_id_seq OWNED BY public.requests.request_i
 
 
 --
--- TOC entry 224 (class 1259 OID 41790)
+-- TOC entry 221 (class 1259 OID 42104)
 -- Name: services; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -179,7 +180,7 @@ CREATE TABLE public.services (
 ALTER TABLE public.services OWNER TO postgres;
 
 --
--- TOC entry 225 (class 1259 OID 41796)
+-- TOC entry 220 (class 1259 OID 42103)
 -- Name: services_service_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -195,8 +196,8 @@ CREATE SEQUENCE public.services_service_id_seq
 ALTER SEQUENCE public.services_service_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4968 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 4969 (class 0 OID 0)
+-- Dependencies: 220
 -- Name: services_service_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -204,7 +205,7 @@ ALTER SEQUENCE public.services_service_id_seq OWNED BY public.services.service_i
 
 
 --
--- TOC entry 226 (class 1259 OID 41797)
+-- TOC entry 225 (class 1259 OID 42135)
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -218,7 +219,7 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 41800)
+-- TOC entry 224 (class 1259 OID 42134)
 -- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -234,8 +235,8 @@ CREATE SEQUENCE public.users_user_id_seq
 ALTER SEQUENCE public.users_user_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4969 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 4970 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -243,7 +244,7 @@ ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
 
 
 --
--- TOC entry 4766 (class 2604 OID 41801)
+-- TOC entry 4773 (class 2604 OID 42180)
 -- Name: notaries notary_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -251,7 +252,7 @@ ALTER TABLE ONLY public.notaries ALTER COLUMN notary_id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 4768 (class 2604 OID 41802)
+-- TOC entry 4771 (class 2604 OID 42181)
 -- Name: request_services request_detail_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -259,7 +260,7 @@ ALTER TABLE ONLY public.request_services ALTER COLUMN request_detail_id SET DEFA
 
 
 --
--- TOC entry 4769 (class 2604 OID 41803)
+-- TOC entry 4766 (class 2604 OID 42182)
 -- Name: requests request_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -267,7 +268,7 @@ ALTER TABLE ONLY public.requests ALTER COLUMN request_id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 4772 (class 2604 OID 41804)
+-- TOC entry 4770 (class 2604 OID 42183)
 -- Name: services service_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -275,7 +276,7 @@ ALTER TABLE ONLY public.services ALTER COLUMN service_id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 4773 (class 2604 OID 41805)
+-- TOC entry 4772 (class 2604 OID 42184)
 -- Name: users user_id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -283,7 +284,7 @@ ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.u
 
 
 --
--- TOC entry 4949 (class 0 OID 41767)
+-- TOC entry 4950 (class 0 OID 42080)
 -- Dependencies: 217
 -- Data for Name: clients; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -294,50 +295,38 @@ COPY public.clients (client_phone, client_name) FROM stdin;
 89233334455	Филонов Федор
 \.
 
+-- TOC entry 4958 (class 0 OID 42135)
+-- Dependencies: 225
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (user_id, login, password_hash) FROM stdin;
+97	notary	$2a$11$BvWR4i7jccbfCqCD17iW1u3XvZ26A/8hx25X3yWknifTWctDgICfe
+98	helper1	$2a$11$ZdYJ8psvQJvORUUpEZdkaOWbRI1k64pnOLRfet3UpDNnStbDp0qcO
+\.
 
 --
--- TOC entry 4950 (class 0 OID 41770)
--- Dependencies: 218
+-- TOC entry 4960 (class 0 OID 42144)
+-- Dependencies: 227
 -- Data for Name: notaries; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.notaries (notary_id, user_id, notary_name, notary_description, notary_phone, is_notary_helper) FROM stdin;
-43	97	Иванов Иван Иванович	Крутой нотариус (наверн)	8 923 329 99 88	f
-44	98	Петров Петр Петрович	Помощничек №1	\N	t
+45	97	Иванов Иван Иванович	Крутой нотариус(наверн)	8 999 999 88 77	f
+46	98	Петров Петр Петрович	\N	\N	f
 \.
 
 
---
--- TOC entry 4952 (class 0 OID 41777)
--- Dependencies: 220
--- Data for Name: request_services; Type: TABLE DATA; Schema: public; Owner: postgres
---
 
-COPY public.request_services (request_detail_id, request_id, service_id) FROM stdin;
-\.
 
 
 --
--- TOC entry 4954 (class 0 OID 41781)
--- Dependencies: 222
--- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.requests (request_id, client_phone, additional_information, request_status, request_date, date_of_completion) FROM stdin;
-365	89292920366	Оооч надо срочно!!!	назначена дата	2026-05-20 02:01:11.957807+07	2026-05-16 16:00:00+07
-366	87777779922	Срочно нужно оформить	отказано	2026-05-20 02:36:58.062975+07	\N
-367	89233334455		выполнено	2026-05-20 03:03:17.031053+07	\N
-\.
-
-
---
--- TOC entry 4956 (class 0 OID 41790)
--- Dependencies: 224
+-- TOC entry 4954 (class 0 OID 42104)
+-- Dependencies: 221
 -- Data for Name: services; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.services (service_id, service_name, service_description, service_price) FROM stdin;
-77	Новое_97575413-b1bc-4db9-8c4d-fe7def3bab19	Старое описание	1000.00
 53	Нотариальная доверенность	Письменное уполномочие, выдаваемое одним лицом (доверителем) другому лицу (поверенному) для представительства перед третьими лицами, удостоверенное нотариусом, подтверждающее законность делегированных полномочий	3800.00
 54	Доверенность на квартиру	Официальный документ, предоставляющий поверенному право совершать сделки и юридические действия с конкретным объектом недвижимости: управление, распоряжение, регистрационные действия, получение документов и выписку из квартиры	555.00
 55	Доверенность на автомобиль	Нотариально удостоверенный документ, дающий право поверенному управлять, распоряжаться транспортным средством, снимать и ставить на учёт в ГИБДД, проходить технический осмотр, оформлять страховку и получать документы на автомобиль	3800.00
@@ -358,38 +347,52 @@ COPY public.services (service_id, service_name, service_description, service_pri
 
 
 --
--- TOC entry 4958 (class 0 OID 41797)
--- Dependencies: 226
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+-- TOC entry 4952 (class 0 OID 42086)
+-- Dependencies: 219
+-- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (user_id, login, password_hash) FROM stdin;
-97	notary	$2a$11$BvWR4i7jccbfCqCD17iW1u3XvZ26A/8hx25X3yWknifTWctDgICfe
-98	helper1	$2a$11$ZdYJ8psvQJvORUUpEZdkaOWbRI1k64pnOLRfet3UpDNnStbDp0qcO
+COPY public.requests (request_id, client_phone, total_approximate_price, additional_information, request_status, request_date, date_of_completion) FROM stdin;
+365	89292920366	0.00	Оооч надо срочно!!!	назначена дата	2026-05-20 02:01:11.957807+07	2026-05-16 16:00:00+07
+366	87777779922	0.00	Срочно нужно оформить	отказано	2026-05-20 02:36:58.062975+07	\N
+367	89233334455	0.00		выполнено	2026-05-20 03:03:17.031053+07	\N
 \.
 
-
 --
--- TOC entry 4970 (class 0 OID 0)
--- Dependencies: 219
--- Name: notaries_notary_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- TOC entry 4956 (class 0 OID 42116)
+-- Dependencies: 223
+-- Data for Name: request_services; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notaries_notary_id_seq', 44, true);
-
+COPY public.request_services (request_detail_id, request_id, service_id) FROM stdin;
+8	365	55
+9	365	57
+10	366	67
+11	367	54
+\.
 
 --
 -- TOC entry 4971 (class 0 OID 0)
--- Dependencies: 221
--- Name: request_services_request_detail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 226
+-- Name: notaries_notary_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.request_services_request_detail_id_seq', 7, true);
+SELECT pg_catalog.setval('public.notaries_notary_id_seq', 46, true);
 
 
 --
 -- TOC entry 4972 (class 0 OID 0)
--- Dependencies: 223
+-- Dependencies: 222
+-- Name: request_services_request_detail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.request_services_request_detail_id_seq', 11, true);
+
+
+--
+-- TOC entry 4973 (class 0 OID 0)
+-- Dependencies: 218
 -- Name: requests_request_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -397,8 +400,8 @@ SELECT pg_catalog.setval('public.requests_request_id_seq', 367, true);
 
 
 --
--- TOC entry 4973 (class 0 OID 0)
--- Dependencies: 225
+-- TOC entry 4974 (class 0 OID 0)
+-- Dependencies: 220
 -- Name: services_service_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -406,8 +409,8 @@ SELECT pg_catalog.setval('public.services_service_id_seq', 68, true);
 
 
 --
--- TOC entry 4974 (class 0 OID 0)
--- Dependencies: 227
+-- TOC entry 4975 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -415,7 +418,7 @@ SELECT pg_catalog.setval('public.users_user_id_seq', 98, true);
 
 
 --
--- TOC entry 4777 (class 2606 OID 41807)
+-- TOC entry 4778 (class 2606 OID 42084)
 -- Name: clients clients_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -424,7 +427,7 @@ ALTER TABLE ONLY public.clients
 
 
 --
--- TOC entry 4779 (class 2606 OID 41809)
+-- TOC entry 4794 (class 2606 OID 42152)
 -- Name: notaries notaries_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -433,7 +436,7 @@ ALTER TABLE ONLY public.notaries
 
 
 --
--- TOC entry 4781 (class 2606 OID 41811)
+-- TOC entry 4796 (class 2606 OID 42154)
 -- Name: notaries notaries_user_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -442,7 +445,7 @@ ALTER TABLE ONLY public.notaries
 
 
 --
--- TOC entry 4783 (class 2606 OID 41813)
+-- TOC entry 4786 (class 2606 OID 42121)
 -- Name: request_services request_services_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -451,7 +454,7 @@ ALTER TABLE ONLY public.request_services
 
 
 --
--- TOC entry 4787 (class 2606 OID 41815)
+-- TOC entry 4780 (class 2606 OID 42097)
 -- Name: requests requests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -460,7 +463,7 @@ ALTER TABLE ONLY public.requests
 
 
 --
--- TOC entry 4789 (class 2606 OID 41817)
+-- TOC entry 4782 (class 2606 OID 42112)
 -- Name: services services_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -469,7 +472,7 @@ ALTER TABLE ONLY public.services
 
 
 --
--- TOC entry 4791 (class 2606 OID 41819)
+-- TOC entry 4784 (class 2606 OID 42114)
 -- Name: services services_service_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -478,7 +481,7 @@ ALTER TABLE ONLY public.services
 
 
 --
--- TOC entry 4785 (class 2606 OID 41821)
+-- TOC entry 4788 (class 2606 OID 42123)
 -- Name: request_services unique_request_service; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -487,7 +490,7 @@ ALTER TABLE ONLY public.request_services
 
 
 --
--- TOC entry 4793 (class 2606 OID 41823)
+-- TOC entry 4790 (class 2606 OID 42142)
 -- Name: users users_login_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -496,7 +499,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4795 (class 2606 OID 41825)
+-- TOC entry 4792 (class 2606 OID 42140)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -505,7 +508,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4796 (class 2606 OID 41826)
+-- TOC entry 4803 (class 2606 OID 42175)
 -- Name: notaries fk_notaries_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -514,7 +517,7 @@ ALTER TABLE ONLY public.notaries
 
 
 --
--- TOC entry 4798 (class 2606 OID 41831)
+-- TOC entry 4799 (class 2606 OID 42165)
 -- Name: request_services fk_request_services_request; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -523,7 +526,7 @@ ALTER TABLE ONLY public.request_services
 
 
 --
--- TOC entry 4799 (class 2606 OID 41836)
+-- TOC entry 4800 (class 2606 OID 42170)
 -- Name: request_services fk_request_services_service; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -532,7 +535,7 @@ ALTER TABLE ONLY public.request_services
 
 
 --
--- TOC entry 4802 (class 2606 OID 41841)
+-- TOC entry 4797 (class 2606 OID 42160)
 -- Name: requests fk_requests_client; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -541,7 +544,7 @@ ALTER TABLE ONLY public.requests
 
 
 --
--- TOC entry 4797 (class 2606 OID 41846)
+-- TOC entry 4804 (class 2606 OID 42155)
 -- Name: notaries notaries_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -550,7 +553,7 @@ ALTER TABLE ONLY public.notaries
 
 
 --
--- TOC entry 4800 (class 2606 OID 41851)
+-- TOC entry 4801 (class 2606 OID 42124)
 -- Name: request_services request_services_request_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -559,7 +562,7 @@ ALTER TABLE ONLY public.request_services
 
 
 --
--- TOC entry 4801 (class 2606 OID 41856)
+-- TOC entry 4802 (class 2606 OID 42129)
 -- Name: request_services request_services_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -568,7 +571,7 @@ ALTER TABLE ONLY public.request_services
 
 
 --
--- TOC entry 4803 (class 2606 OID 41861)
+-- TOC entry 4798 (class 2606 OID 42098)
 -- Name: requests requests_client_phone_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -576,11 +579,11 @@ ALTER TABLE ONLY public.requests
     ADD CONSTRAINT requests_client_phone_fkey FOREIGN KEY (client_phone) REFERENCES public.clients(client_phone);
 
 
--- Completed on 2026-05-31 22:35:44
+-- Completed on 2026-05-31 23:07:09
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict X3fFlfaKs8Me1986SPkY08f9dd05VK9gj9nKT6BBI3XHEZMTc6f71N0cQKRghJc
+\unrestrict 2n2mL4SHpKC887TMQnSOQYRJLa6YXEAnbyMU3yxL2z365o1AlVJiynucgYMfeWR
 

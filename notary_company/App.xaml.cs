@@ -75,28 +75,34 @@ namespace notary_company
                 cmd.ExecuteNonQuery();
             }
 
-            MessageBox.Show($"База данных '{dbName}' создана.\nВыполняется восстановление из резервной копии...",
-                            "Инициализация", MessageBoxButton.OK, MessageBoxImage.Information);
+            bool schemaOk = RestoreFromSqlFile(dbName, mainConnectionString, "notary_bd.sql", "схемы");
 
-            bool success = RestoreDatabaseFromBackup(dbName, adminConnectionString);
-
-            if (!success)
+            if (!schemaOk)
             {
-                MessageBox.Show("База создана, но восстановление из бэкапа не удалось.",
-                                "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Не удалось создать схему базы данных. Приложение будет закрыто.",
+                                "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown(1);
+                return;
+            }
+
+            bool dataOk = RestoreFromSqlFile(dbName, mainConnectionString, "notary_backup.sql", "данных");
+
+            if (!dataOk)
+            {
+                MessageBox.Show("Резервная копия данных не найдена или не восстановлена.\nПриложение запустится с пустой базой данных.",
+                                "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
-        private bool RestoreDatabaseFromBackup(string dbName, string mainConnectionString)
+        private bool RestoreFromSqlFile(string dbName, string mainConnectionString, string fileName, string label)
         {
             try
             {
-                string backupFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                    "Database", "notary_backup.sql");
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", fileName);
 
-                if (!File.Exists(backupFilePath))
+                if (!File.Exists(filePath))
                 {
-                    MessageBox.Show($"Файл бэкапа не найден:\n{backupFilePath}",
+                    MessageBox.Show($"Файл {label} не найден:\n{filePath}",
                                     "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
@@ -110,13 +116,12 @@ namespace notary_company
                     return false;
                 }
 
-                //пароль из строки подключения
                 var connBuilder = new NpgsqlConnectionStringBuilder(mainConnectionString);
 
                 var processInfo = new ProcessStartInfo
                 {
                     FileName = psqlPath,
-                    Arguments = $"-h localhost -p 5432 -U postgres -d \"{dbName}\" -f \"{backupFilePath}\"",
+                    Arguments = $"-h localhost -p 5432 -U postgres -d \"{dbName}\" -f \"{filePath}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
@@ -126,20 +131,19 @@ namespace notary_company
                 processInfo.EnvironmentVariables["PGPASSWORD"] = connBuilder.Password;
 
                 using var process = Process.Start(processInfo);
-                string output = process.StandardOutput.ReadToEnd();
                 string error = process.StandardError.ReadToEnd();
                 process.WaitForExit();
 
                 if (process.ExitCode == 0)
                     return true;
 
-                MessageBox.Show($"Ошибка при восстановлении:\n{error}",
+                MessageBox.Show($"Ошибка при восстановлении {label}:\n{error}",
                                 "Ошибка psql", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при вызове psql:\n{ex.Message}",
+                MessageBox.Show($"Ошибка при вызове psql ({label}):\n{ex.Message}",
                                 "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }

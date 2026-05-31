@@ -16,7 +16,6 @@ namespace notary_company.Repositories
             _connection = connection;
         }
         
-
         public int Create(Request entity)
         {
             const string sql = @"

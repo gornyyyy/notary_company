@@ -243,6 +243,10 @@ namespace notary_company.Pages
             ApplyFilters();
         }
 
-        // сделать кнопку reset для обновления 
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadRequests();
+            ApplyFilters();
+        }
     }
 }
