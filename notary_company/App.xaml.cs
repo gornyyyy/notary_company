@@ -45,7 +45,7 @@ namespace notary_company
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка запуска: {ex.Message}", "Критическая ошибка",
+                MessageBox.Show($"Ошибка запуска: {ex.Message} (Возможно неверный пароль)", "Критическая ошибка",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
             }
@@ -80,12 +80,7 @@ namespace notary_company
 
             bool success = RestoreDatabaseFromBackup(dbName, adminConnectionString);
 
-            if (success)
-            {
-                MessageBox.Show("База данных успешно восстановлена из резервной копии!",
-                                "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
+            if (!success)
             {
                 MessageBox.Show("База создана, но восстановление из бэкапа не удалось.",
                                 "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -97,7 +92,7 @@ namespace notary_company
             try
             {
                 string backupFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                    "Database", "notary_backup3.sql");
+                    "Database", "notary_backup.backup");
 
                 if (!File.Exists(backupFilePath))
                 {
