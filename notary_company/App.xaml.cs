@@ -87,12 +87,12 @@ namespace notary_company
             }
         }
 
-        private bool RestoreDatabaseFromBackup(string dbName, string adminConnectionString)
+        private bool RestoreDatabaseFromBackup(string dbName, string mainConnectionString)
         {
             try
             {
                 string backupFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                    "Database", "notary_backup.backup");
+                    "Database", "notary_backup.sql");
 
                 if (!File.Exists(backupFilePath))
                 {
@@ -101,73 +101,69 @@ namespace notary_company
                     return false;
                 }
 
-                string pgRestorePath = FindPgRestorePath();
+                string psqlPath = FindPsqlPath();
 
-                if (string.IsNullOrEmpty(pgRestorePath))
+                if (string.IsNullOrEmpty(psqlPath))
                 {
-                    MessageBox.Show("Не удалось найти pg_restore.exe.\nУбедитесь, что PostgreSQL установлен и добавлен в PATH.",
+                    MessageBox.Show("Не удалось найти psql.exe.",
                                     "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
 
+                //пароль из строки подключения
+                var connBuilder = new NpgsqlConnectionStringBuilder(mainConnectionString);
+
                 var processInfo = new ProcessStartInfo
                 {
-                    FileName = pgRestorePath,
-                    Arguments = $"-h localhost -p 5432 -U postgres -d \"{dbName}\" " +
-                               $"--clean --if-exists --verbose \"{backupFilePath}\"",
+                    FileName = psqlPath,
+                    Arguments = $"-h localhost -p 5432 -U postgres -d \"{dbName}\" -f \"{backupFilePath}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
 
+                processInfo.EnvironmentVariables["PGPASSWORD"] = connBuilder.Password;
+
                 using var process = Process.Start(processInfo);
                 string output = process.StandardOutput.ReadToEnd();
                 string error = process.StandardError.ReadToEnd();
-
                 process.WaitForExit();
 
                 if (process.ExitCode == 0)
-                {
                     return true;
-                }
-                else
-                {
-                    MessageBox.Show($"Ошибка при восстановлении:\n{error}",
-                                    "Ошибка pg_restore", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
+
+                MessageBox.Show($"Ошибка при восстановлении:\n{error}",
+                                "Ошибка psql", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при вызове pg_restore:\n{ex.Message}",
+                MessageBox.Show($"Ошибка при вызове psql:\n{ex.Message}",
                                 "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
         }
 
-        private string FindPgRestorePath()
+        private string FindPsqlPath()
         {
-            string pathFromEnv = FindInEnvironmentPath("pg_restore.exe");
+            string pathFromEnv = FindInEnvironmentPath("psql.exe");
             if (!string.IsNullOrEmpty(pathFromEnv))
                 return pathFromEnv;
 
             var standardPaths = new[]
             {
-                @"C:\Program Files\PostgreSQL\17\bin\pg_restore.exe",
-                @"C:\Program Files\PostgreSQL\16\bin\pg_restore.exe",
-                @"C:\Program Files\PostgreSQL\15\bin\pg_restore.exe",
-                @"C:\Program Files\PostgreSQL\14\bin\pg_restore.exe",
-                @"C:\Program Files\PostgreSQL\13\bin\pg_restore.exe",
-                @"C:\Program Files (x86)\PostgreSQL\17\bin\pg_restore.exe",
-                @"C:\Program Files (x86)\PostgreSQL\16\bin\pg_restore.exe",
+                @"C:\Program Files\PostgreSQL\17\bin\psql.exe",
+                @"C:\Program Files\PostgreSQL\16\bin\psql.exe",
+                @"C:\Program Files\PostgreSQL\15\bin\psql.exe",
+                @"C:\Program Files\PostgreSQL\14\bin\psql.exe",
+                @"C:\Program Files\PostgreSQL\13\bin\psql.exe",
+                @"C:\Program Files (x86)\PostgreSQL\17\bin\psql.exe",
+                @"C:\Program Files (x86)\PostgreSQL\16\bin\psql.exe",
             };
 
             foreach (var path in standardPaths)
-            {
-                if (File.Exists(path))
-                    return path;
-            }
+                if (File.Exists(path)) return path;
 
             return null;
         }
