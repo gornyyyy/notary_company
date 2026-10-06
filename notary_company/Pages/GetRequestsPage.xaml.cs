@@ -1,51 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using notary_company.Models;
+using notary_company.shared.Dtos;
 
 namespace notary_company.Pages
 {
     public partial class GetRequestsPage : Page
     {
-        private readonly Facade _facade;
-        private List<Request> _allRequests;
-        private Dictionary<int, List<Service>> _requestServices;
-        private Dictionary<string, Client> _clients;
+        private List<RequestDto> _allRequests;
 
         public GetRequestsPage()
         {
             InitializeComponent();
-            _facade = App.Facade;
-            LoadRequests();
+            Loaded += GetRequestsPage_Loaded;
         }
 
-        private void LoadRequests()
+        private async void GetRequestsPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadRequestsAsync();
+        }
+
+        private async Task LoadRequestsAsync()
         {
             try
             {
-                _allRequests = _facade.getAllRequests();
-                _requestServices = new Dictionary<int, List<Service>>();
-                _clients = new Dictionary<string, Client>();
-
-                foreach (var request in _allRequests)
-                {
-                    var services = _facade.getServicesForRequest(request.Request_id);
-                    _requestServices[request.Request_id] = services;
-                }
-
+                _allRequests = await App.Api.GetRequestsAsync();
                 DisplayRequests(_allRequests);
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                MessageBox.Show($"Ошибка при загрузке заявок: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при загрузке заявок: {ex.Message}", "Ошибка",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void DisplayRequests(List<Request> requests)
+        private void DisplayRequests(List<RequestDto> requests)
         {
             RequestsStackPanel.Children.Clear();
 
@@ -64,7 +59,7 @@ namespace notary_company.Pages
             return DateTime.SpecifyKind(utcDate, DateTimeKind.Utc).ToLocalTime();
         }
 
-        private Border CreateRequestCard(Request request)
+        private Border CreateRequestCard(RequestDto request)
         {
             Border card = new Border
             {
@@ -82,6 +77,7 @@ namespace notary_company.Pages
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
+            // ========== Заголовок с номером и статусом ==========
             Grid headerGrid = new Grid();
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -96,15 +92,16 @@ namespace notary_company.Pages
                 TextWrapping = TextWrapping.Wrap
             };
 
-            if (request.Request_status == "назначена дата" && request.Date_of_completion > DateTime.MinValue)
+            if (request.Request_status == "назначена дата" && request.Date_of_completion.HasValue)
             {
-                DateTime localDate = ConvertUtcToLocal(request.Date_of_completion);
+                DateTime localDate = ConvertUtcToLocal(request.Date_of_completion.Value);
                 requestInfoText.Text += $" - {localDate:dd.MM.yyyy HH:mm}";
             }
 
             Grid.SetColumn(requestInfoText, 0);
             headerGrid.Children.Add(requestInfoText);
 
+            // Ссылка "Изменить статус"
             TextBlock changeStatusText = new TextBlock
             {
                 Text = "✎ Изменить статус",
@@ -122,6 +119,7 @@ namespace notary_company.Pages
             Grid.SetRow(headerGrid, 0);
             mainGrid.Children.Add(headerGrid);
 
+            // ========== Разделитель ==========
             Border separator1 = new Border
             {
                 Height = 1,
@@ -131,7 +129,8 @@ namespace notary_company.Pages
             Grid.SetRow(separator1, 1);
             mainGrid.Children.Add(separator1);
 
-            string clientInfo = $"{request.Client_phone} - {GetClientNameSafe(request.Client_phone)}";
+            // ========== Информация о клиенте ==========
+            string clientInfo = $"{request.Client_phone} - {request.Client_name}";
 
             TextBlock clientText = new TextBlock
             {
@@ -143,10 +142,9 @@ namespace notary_company.Pages
             Grid.SetRow(clientText, 2);
             mainGrid.Children.Add(clientText);
 
+            // ========== Список услуг ==========
             StackPanel servicesPanel = new StackPanel();
-            var services = _requestServices.ContainsKey(request.Request_id)
-                ? _requestServices[request.Request_id]
-                : new List<Service>();
+            var services = request.Services ?? new List<ServiceDto>();
 
             for (int i = 0; i < services.Count; i++)
             {
@@ -180,19 +178,7 @@ namespace notary_company.Pages
             return card;
         }
 
-        private string GetClientNameSafe(string phone)
-        {
-            try
-            {
-                return _facade.getClientName(phone);
-            }
-            catch (Exception ex)
-            {
-                return "Неизвестный клиент";
-            }
-        }
-
-        private string GetStatusText(Request request)
+        private string GetStatusText(RequestDto request)
         {
             switch (request.Request_status)
             {
@@ -209,13 +195,13 @@ namespace notary_company.Pages
             }
         }
 
-        private void OpenChangeStatusWindow(Request request)
+        private async void OpenChangeStatusWindow(RequestDto request)
         {
-            var window = new ChangeStatusWindow(request, _facade);
+            var window = new ChangeStatusWindow(request);
             window.Owner = Window.GetWindow(this);
             window.ShowDialog();
 
-            LoadRequests();
+            await LoadRequestsAsync();
             ApplyFilters();
         }
 
@@ -243,9 +229,9 @@ namespace notary_company.Pages
             ApplyFilters();
         }
 
-        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        private async void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            LoadRequests();
+            await LoadRequestsAsync();
             ApplyFilters();
         }
     }

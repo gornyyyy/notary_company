@@ -1,17 +1,14 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Npgsql;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.IO;
+using System.Net.Http;
 using System.Windows;
+using notary_company.Services;
 
 namespace notary_company
 {
     public partial class App : Application
     {
-        public static Facade Facade { get; private set; }
+        public static ApiService Api { get; private set; }
         public static IConfiguration Configuration { get; private set; }
 
         private void App_Startup(object sender, StartupEventArgs e)
@@ -23,177 +20,35 @@ namespace notary_company
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .Build();
 
-                string connectionString = Configuration.GetConnectionString("Postgres");
+                string baseUrl = Configuration["ApiSettings:BaseUrl"];
 
-                if (string.IsNullOrWhiteSpace(connectionString) || connectionString.Contains("YOUR_PASSWORD_HERE"))
+                if (string.IsNullOrWhiteSpace(baseUrl))
                 {
-                    MessageBox.Show(
-                        "Не настроена строка подключения!\n\n" +
-                        "Откройте файл appsettings.json и замените YOUR_PASSWORD_HERE на ваш пароль от PostgreSQL.",
-                        "Ошибка конфигурации",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-
+                    MessageBox.Show("Не настроен адрес API в appsettings.json (ApiSettings:BaseUrl).",
+                                    "Ошибка конфигурации", MessageBoxButton.OK, MessageBoxImage.Warning);
                     Shutdown(1);
                     return;
                 }
 
-                InitializeDatabase(connectionString);
+                var httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri(baseUrl),
+                    Timeout = TimeSpan.FromSeconds(30)
+                };
 
-                IDbConnection connection = new NpgsqlConnection(connectionString);
-                Facade = new Facade(connection);
+                Api = new ApiService(httpClient);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка запуска: {ex.Message} (Возможно неверный пароль)", "Критическая ошибка",
+                MessageBox.Show($"Ошибка запуска: {ex.Message}", "Критическая ошибка",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
             }
         }
 
-        private void InitializeDatabase(string mainConnectionString)
-        {
-            var builder = new NpgsqlConnectionStringBuilder(mainConnectionString);
-            string dbName = builder.Database;
-            string adminConnectionString = mainConnectionString.Replace($"Database={dbName}", "Database=postgres");
-
-            using var adminConn = new NpgsqlConnection(adminConnectionString);
-            adminConn.Open();
-
-            bool dbExists = false;
-            using (var cmd = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @dbname", adminConn))
-            {
-                cmd.Parameters.AddWithValue("@dbname", dbName);
-                dbExists = cmd.ExecuteScalar() != null;
-            }
-
-            if (dbExists)
-                return;
-
-            using (var cmd = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\" WITH ENCODING='UTF8' TEMPLATE=template0", adminConn))
-            {
-                cmd.ExecuteNonQuery();
-            }
-
-            bool schemaOk = RestoreFromSqlFile(dbName, mainConnectionString, "notary_bd.sql", "схемы");
-
-            if (!schemaOk)
-            {
-                MessageBox.Show("Не удалось создать схему базы данных. Приложение будет закрыто.",
-                                "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Shutdown(1);
-                return;
-            }
-
-            bool dataOk = RestoreFromSqlFile(dbName, mainConnectionString, "notary_backup.sql", "данных");
-
-            if (!dataOk)
-            {
-                MessageBox.Show("Резервная копия данных не найдена или не восстановлена.\nПриложение запустится с пустой базой данных.",
-                                "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-        }
-
-        private bool RestoreFromSqlFile(string dbName, string mainConnectionString, string fileName, string label)
-        {
-            try
-            {
-                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database", fileName);
-
-                if (!File.Exists(filePath))
-                {
-                    MessageBox.Show($"Файл {label} не найден:\n{filePath}",
-                                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                string psqlPath = FindPsqlPath();
-
-                if (string.IsNullOrEmpty(psqlPath))
-                {
-                    MessageBox.Show("Не удалось найти psql.exe.",
-                                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
-                var connBuilder = new NpgsqlConnectionStringBuilder(mainConnectionString);
-
-                var processInfo = new ProcessStartInfo
-                {
-                    FileName = psqlPath,
-                    Arguments = $"-h localhost -p 5432 -U postgres -d \"{dbName}\" -f \"{filePath}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                processInfo.EnvironmentVariables["PGPASSWORD"] = connBuilder.Password;
-
-                using var process = Process.Start(processInfo);
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
-
-                if (process.ExitCode == 0)
-                    return true;
-
-                MessageBox.Show($"Ошибка при восстановлении {label}:\n{error}",
-                                "Ошибка psql", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при вызове psql ({label}):\n{ex.Message}",
-                                "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
-        }
-
-        private string FindPsqlPath()
-        {
-            string pathFromEnv = FindInEnvironmentPath("psql.exe");
-            if (!string.IsNullOrEmpty(pathFromEnv))
-                return pathFromEnv;
-
-            var standardPaths = new[]
-            {
-                @"C:\Program Files\PostgreSQL\18\bin\psql.exe",
-                @"C:\Program Files\PostgreSQL\17\bin\psql.exe",
-                @"C:\Program Files\PostgreSQL\16\bin\psql.exe",
-                @"C:\Program Files\PostgreSQL\15\bin\psql.exe",
-                @"C:\Program Files\PostgreSQL\14\bin\psql.exe",
-                @"C:\Program Files\PostgreSQL\13\bin\psql.exe",
-                @"C:\Program Files (x86)\PostgreSQL\17\bin\psql.exe",
-                @"C:\Program Files (x86)\PostgreSQL\16\bin\psql.exe",
-            };
-
-            foreach (var path in standardPaths)
-                if (File.Exists(path)) return path;
-
-            return null;
-        }
-
-        private string FindInEnvironmentPath(string fileName)
-        {
-            try
-            {
-                string pathEnv = Environment.GetEnvironmentVariable("PATH") ?? "";
-
-                foreach (var dir in pathEnv.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    string fullPath = Path.Combine(dir.Trim(), fileName);
-                    if (File.Exists(fullPath))
-                        return fullPath;
-                }
-            }
-            catch { }
-
-            return null;
-        }
-
         private void App_Exit(object sender, ExitEventArgs e)
         {
-            Facade?.Dispose();
+            Api?.Dispose();
         }
     }
 }

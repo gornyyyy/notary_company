@@ -1,34 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using notary_company.shared.Dtos;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using notary_company.Models;
 
 namespace notary_company.Pages
 {
     public partial class MainInfoPage : Page
     {
-        private readonly Facade _facade;
 
         public MainInfoPage()
         {
             InitializeComponent();
-            _facade = App.Facade;
-            LoadNotaries();
+            Loaded += MainInfoPage_loaded;
         }
 
-        private void LoadNotaries()
+        private async void MainInfoPage_loaded(object sender, RoutedEventArgs e)
         {
-            List<Notary> notaries = _facade.getAllNotary();
+            await LoadNotariesAsync();
+        }
 
-            foreach (var notary in notaries)
+        private async Task LoadNotariesAsync()
+        {
+            try
             {
-                Border card = CreateNotaryCard(notary);
-                NotariesStackPanel.Children.Add(card);
+                var notaries = await App.Api.GetNotariesAsync();
+                NotariesStackPanel.Children.Clear();
+                foreach (var notary in notaries)
+                {
+                    Border card = CreateNotaryCard(notary);
+                    NotariesStackPanel.Children.Add(card);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"Нет связи с сервером: {ex.Message}", "Ошибка сети",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
-        private Border CreateNotaryCard(Notary notary)
+        private Border CreateNotaryCard(NotaryDto notary)
         {
             Border card = new Border
             {

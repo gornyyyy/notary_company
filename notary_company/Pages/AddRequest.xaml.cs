@@ -1,51 +1,50 @@
-﻿using notary_company.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using notary_company.shared.Dtos;
 
 namespace notary_company.Pages
 {
     public partial class AddRequest : Window
     {
-        Facade _facade;
-        private List<Service> _availableServices;
+        private List<ServiceDto> _availableServices;
         private List<string> _selectedServices;
 
         public AddRequest()
         {
             InitializeComponent();
-            _facade = App.Facade;
-
             _selectedServices = new List<string>();
-
-            LoadServices();
-
+            Loaded += AddRequest_Loaded;
             ClientPhoneTextBox.Text = "8";
         }
 
-        private void LoadServices()
+        private async void AddRequest_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                _availableServices = _facade.getAllServices();
+                _availableServices = await App.Api.GetServicesAsync();
                 ServicesComboBox.ItemsSource = _availableServices;
+                ServicesComboBox.DisplayMemberPath = "Service_name";
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex)
             {
-                MessageBox.Show($"Не удалось загрузить список услуг: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Не удалось загрузить список услуг: {ex.Message}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void ServicesComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void ServicesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AddServiceButton.IsEnabled = ServicesComboBox.SelectedItem != null;
         }
 
         private void AddServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedService = ServicesComboBox.SelectedItem as Service;
+            var selectedService = ServicesComboBox.SelectedItem as ServiceDto;
 
             if (selectedService == null)
                 return;
@@ -58,7 +57,8 @@ namespace notary_company.Pages
             }
             else
             {
-                MessageBox.Show("Эта услуга уже добавлена!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Эта услуга уже добавлена!", "Внимание",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -85,7 +85,7 @@ namespace notary_company.Pages
             }
         }
 
-        private void CreateButton_Click(object sender, RoutedEventArgs e)
+        private async void CreateButton_Click(object sender, RoutedEventArgs e)
         {
             string name = ClientNameTextBox.Text;
             string phone = ClientPhoneTextBox.Text;
@@ -119,21 +119,33 @@ namespace notary_company.Pages
             {
                 string descr = AdditionalInfoTextBox.Text;
 
-                _facade.createRequest(phone, name, descr, _selectedServices);
+                await App.Api.CreateRequestAsync(new CreateRequestDto
+                {
+                    Client_phone = phone,
+                    Client_name = name,
+                    Additional_information = descr,
+                    Services = _selectedServices
+                });
 
-                MessageBox.Show("Ваша заявка подана.\nC вами скоро свяжутся.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Ваша заявка подана.\nC вами скоро свяжутся.", "Успех",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
 
-                this.DialogResult = true;
-                this.Close();
+                DialogResult = true;
+                Close();
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"Нет связи с сервером: {ex.Message}", "Ошибка сети",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Произошла ошибка при создании заявки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Произошла ошибка при создании заявки: {ex.Message}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            
         }
 
-        private void ClientPhoneTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        private void ClientPhoneTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             foreach (char ch in e.Text)
             {
@@ -153,7 +165,7 @@ namespace notary_company.Pages
             }
         }
 
-        private void ClientPhoneTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void ClientPhoneTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             int cursorPosition = ClientPhoneTextBox.CaretIndex;
 
@@ -179,8 +191,7 @@ namespace notary_company.Pages
                     ClientPhoneTextBox.CaretIndex = ClientPhoneTextBox.Text.Length;
             }
 
-            int newPosition = 0; if (newPosition == 0)
-                newPosition = formattedPhone.Length;
+            int newPosition = formattedPhone.Length;
 
             if (newPosition == 0)
                 newPosition = 1;
@@ -207,7 +218,6 @@ namespace notary_company.Pages
             else
                 return $"{digits.Substring(0, 1)} {digits.Substring(1, 3)} {digits.Substring(4, 3)} {digits.Substring(7, 2)} {digits.Substring(9)}";
         }
-
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;

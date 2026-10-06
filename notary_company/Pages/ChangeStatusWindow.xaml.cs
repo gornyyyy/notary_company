@@ -1,4 +1,4 @@
-﻿using notary_company.Models;
+﻿using notary_company.shared.Dtos;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Windows;
@@ -8,36 +8,27 @@ namespace notary_company.Pages
 {
     public partial class ChangeStatusWindow : Window
     {
-        private readonly Request _request;
-        private readonly Facade _facade;
+        private readonly RequestDto _request;
 
-        public ChangeStatusWindow(Request request, Facade facade)
+        public ChangeStatusWindow(RequestDto request)
         {
             InitializeComponent();
             _request = request;
-            _facade = facade;
 
-            try
+            foreach (ComboBoxItem item in StatusComboBox.Items)
             {
-                foreach (ComboBoxItem item in StatusComboBox.Items)
+                if (item.Content.ToString() == _request.Request_status)
                 {
-                    if (item.Content.ToString() == _request.Request_status)
-                    {
-                        StatusComboBox.SelectedItem = item;
-                        break;
-                    }
-                }
-
-                if (_request.Date_of_completion > DateTime.MinValue)
-                {
-                    DateTime localDate = ConvertUtcToLocal(_request.Date_of_completion);
-                    DatePicker.SelectedDate = localDate.Date;
-                    TimeTextBox.Text = localDate.ToString("HH:mm");
+                    StatusComboBox.SelectedItem = item;
+                    break;
                 }
             }
-            catch (Exception ex)
+
+            if (_request.Date_of_completion.HasValue)
             {
-                MessageBox.Show($"Ошибка при загрузке статуса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                DateTime localDate = ConvertUtcToLocal(_request.Date_of_completion.Value);
+                DatePicker.SelectedDate = localDate.Date;
+                TimeTextBox.Text = localDate.ToString("HH:mm");
             }
         }
 
@@ -71,7 +62,7 @@ namespace notary_company.Pages
             }
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -103,18 +94,22 @@ namespace notary_company.Pages
                     }
                 }
 
-                _facade.updateRequestStatus(_request.Request_id, selectedStatus, assignedDateUtc);
-                MessageBox.Show("Статус успешно изменен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                await App.Api.UpdateRequestStatusAsync(_request.Request_id,
+                    new UpdateStatusDto
+                    {
+                        New_status = selectedStatus,
+                        Date_of_completion = assignedDateUtc
+                    });
+
+                MessageBox.Show("Статус успешно изменён", "Успех",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
                 DialogResult = true;
                 Close();
             }
-            catch (ValidationException ex)
-            {
-                MessageBox.Show($"Ошибка валидации: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при изменении статуса: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при изменении статуса: {ex.Message}",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

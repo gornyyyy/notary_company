@@ -1,36 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using notary_company.shared.Dtos;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using notary_company.Models;
 
 namespace notary_company.Pages
 {
     public partial class CatalogPage : Page
     {
-        private readonly Facade _facade;
 
         public CatalogPage()
         {
             InitializeComponent();
-            _facade = App.Facade;
-            LoadServices();
+            Loaded += CatalodPage_loaded;
         }
 
-        private void LoadServices()
+        private async void CatalodPage_loaded(object sender, RoutedEventArgs e)
         {
-            List<Service> services = _facade.getAllServices();
+            await LoadServicesAsync();
+        }
 
-            foreach (var service in services)
+        private async Task LoadServicesAsync()
+        {
+            try
             {
-                Border card = CreateServiceCard(service);
-                ServicesWrapPanel.Children.Add(card);
+                var services = await App.Api.GetServicesAsync();
+                ServicesWrapPanel.Children.Clear();
+                foreach (var service in services)
+                {
+                    Border card = CreateServiceCard(service);
+                    ServicesWrapPanel.Children.Add(card);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"Нет связи с сервером: {ex.Message}", "Ошибка сети",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
-        private Border CreateServiceCard(Service service)
+        private Border CreateServiceCard(ServiceDto service)
         {
             // Основной прямоугольник (карточка)
             Border card = new Border
@@ -111,12 +123,12 @@ namespace notary_company.Pages
             transform.BeginAnimation(ScaleTransform.ScaleYProperty, animation);
         }
 
-        private void Card_MouseLeftButtonDown(Service service)
+        private void Card_MouseLeftButtonDown(ServiceDto service)
         {
             ShowServiceDetails(service);
         }
 
-        private void ShowServiceDetails(Service service)
+        private void ShowServiceDetails(ServiceDto service)
         {
             MessageBox.Show($"Услуга: {service.Service_name}\n\nОписание: {service.Service_description}\n\nЦена: {service.Service_price:N2} ₽",
                             "Подробнее об услуге",
@@ -124,8 +136,8 @@ namespace notary_company.Pages
                             MessageBoxImage.Information);
 
             // Переход на страницу подачи заявки с выбранной услугой
-            // var createRequestPage = new CreateRequestPage(service);
-            // NavigationService.Navigate(createRequestPage);
+            /// var createRequestPage = new CreateRequestPage(service);
+            /// NavigationService.Navigate(createRequestPage);
         }
     }
 }

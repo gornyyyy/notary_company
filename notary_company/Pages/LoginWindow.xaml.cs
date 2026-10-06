@@ -1,52 +1,47 @@
 ﻿using System.Text;
 using System.Windows;
 using System.ComponentModel.DataAnnotations;
-using BCrypt.Net;
-using notary_company.Models;
+using notary_company.shared.Dtos;
 
 namespace notary_company.Pages
 {
     public partial class LoginWindow : Window
     {
         private MainWindow _mainWindow;
-        private Facade _facade;
         public LoginWindow(MainWindow mainWindow)
         {
             InitializeComponent();
 
             _mainWindow = mainWindow;
-
-            _facade = _mainWindow.facade;
         }
 
-        private void BtnLogin_Click(object sender, RoutedEventArgs e)
+        private async void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 string login = txtLogin.Text;
                 string password = txtPassword.Password;
 
-                string passwordhash = _facade.GetNotaryPasswordByLogin(login);
+                var notary = await App.Api.LoginAsync(login, password);
 
-                if (passwordhash != null && BCrypt.Net.BCrypt.Verify(password, passwordhash))
+                if (notary != null)
                 {
+                    _mainWindow.NotaryName = notary.Notary_name;
+                    _mainWindow.SwitchToNotaryPage(notary.Notary_name);
 
-                    _mainWindow.Notary = _facade.GetNotaryByLogin(login);
-                    _mainWindow.SwitchToNotaryPage(_mainWindow.Notary.Notary_name);
-
-                    this.DialogResult = true;
-                    this.Close();
+                    DialogResult = true;
+                    Close();
                 }
                 else
                 {
                     txtStatus.Text = "Неверный логин или пароль!";
                     txtPassword.Clear();
-                    System.Windows.Clipboard.SetText(BCrypt.Net.BCrypt.HashPassword(password));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка: {ex.Message}", "Error",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
