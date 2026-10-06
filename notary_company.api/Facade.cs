@@ -1,5 +1,5 @@
-﻿using notary_company.Models;
-using notary_company.Repositories;
+﻿using notary_company.api.Models;
+using notary_company.api.Repositories;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Text;
 
-namespace notary_company
+namespace notary_company.api
 {
     public class Facade : INotary, IClient
     {

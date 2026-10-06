@@ -1,9 +1,9 @@
-﻿using notary_company.Models;
+﻿using notary_company.api.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace notary_company
+namespace notary_company.api
 {
     public interface IClient
     {

@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using notary_company.Models;
+using notary_company.api.Models;
 
-namespace notary_company.Repositories
+namespace notary_company.api.Repositories
 {
     public class RequestRepository : IRepository<Request>
     {

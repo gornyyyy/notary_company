@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace notary_company.Models
+namespace notary_company.api.Models
 {
     public class Client
     {

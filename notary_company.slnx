@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="notary_company.api/notary_company.api.csproj" Id="a8f83993-8637-4c0c-a203-e7cb48919368" />
+  <Project Path="notary_company.shared/notary_company.shared.csproj" Id="211b1123-6267-406e-9454-698fa5e45c30" />
   <Project Path="notary_company/notary_company.csproj" />
   <Project Path="RepositoryTests/TestProj.csproj" Id="dd806b3e-0551-409d-afad-41331c429f68" />
 </Solution>

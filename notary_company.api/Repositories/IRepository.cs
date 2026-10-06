@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace notary_company.Repositories
+namespace notary_company.api.Repositories
 {
     public interface IRepository<T>
     {
